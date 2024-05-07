@@ -1,0 +1,9 @@
+{% extends "base.html" %} 
+{% block title %} 
+Лента  
+{% endblock %} 
+{% block content %}
+Лента {{context}}
+{% for post in page_obj %}
+{% include "includes/post_card.html" %}
+{% endfor %} {% endblock %}

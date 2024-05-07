@@ -6,5 +6,8 @@ app_name = 'ozon'
 
 urlpatterns = [
     path('', views.XlFormCreateView.as_view(), name='form'),
-    path("<int:pk>/", views.XlFormDetailView.as_view(), name="detail")
+    path("<int:pk>/", views.XlFormDetailView.as_view(), name="detail"),
+    path("edit/<int:pk>", views.XlFormUpdateView.as_view(), name="edit"),
+    path('list/', views.XlFormListView.as_view(), name='list'),
+
 ]
