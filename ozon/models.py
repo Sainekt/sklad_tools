@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 from sklad_tools import settings
 
@@ -18,3 +19,6 @@ class Ozon(models.Model):
     model_list = models.TextField(
         'Список совместимых устройств', max_length=5000
     )
+
+    def get_absolute_url(self):
+        return reverse("ozon:detail", kwargs={"pk": self.pk})
