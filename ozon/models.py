@@ -10,7 +10,8 @@ class Ozon(models.Model):
     article = models.CharField(
         'Артикул', max_length=settings.DEFAULT_CHAR_LENGTH)
     barcode = models.CharField(
-        'Штрих-код', max_length=settings.DEFAULT_CHAR_LENGTH)
+        'Штрих-код', max_length=settings.DEFAULT_CHAR_LENGTH,
+        null=True, blank=True)
     price = models.IntegerField('Цена руб.', default=10000)
     length = models.IntegerField('Длина упаковки мм.', default=180)
     width = models.IntegerField('Ширина упаковки мм.', default=120)
