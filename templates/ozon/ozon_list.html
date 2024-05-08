@@ -3,7 +3,12 @@
 Лента  
 {% endblock %} 
 {% block content %}
-Лента {{context}}
+Лента
 {% for post in page_obj %}
-{% include "includes/post_card.html" %}
-{% endfor %} {% endblock %}
+    <p>{{post.title}} 
+    </p>
+    {{post.barcode}}
+    <hr>
+{% endfor %} 
+{%include "includes/paginator.html" %}
+{% endblock %}

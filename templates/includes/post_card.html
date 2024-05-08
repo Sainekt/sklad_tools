@@ -1,4 +1,4 @@
-<div class="card" style="width: 40rem;">
+{% comment %} <div class="card" style="width: 40rem;">
   <div class="card-body">
     <h5 class="card-title">{{ post.title }}</h5>
     <h6 class="card-subtitle mb-2 text-muted">
@@ -10,4 +10,4 @@
     <p class="card-text">{{ post.text|truncatewords:10 }}</p>
     <a href="{% url 'blog:post_detail' post.id %}" class="card-link">Читать полный текст</a>
   </div>
-</div>
+</div> {% endcomment %}

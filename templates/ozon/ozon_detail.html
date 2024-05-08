@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-  ID записи: {{ object.id }}
-  <hr>
   {% if Ozon.image %}
     <div>
       <!-- Картинку сделаем побольше, чем на странице list/: высотой 200px -->
       <img src="{{ Ozon.image.url }}" height="200">
     </div>
   {% endif %}
-   <h2>Привет, Создано{{ object.title }} {{ object.annotacion }}</h2>      
+  <div 'col-5'>
+   <h2>ID записи: {{ object.id }}</h2>
+   Баркод: {{ object.barcode }}
+   <hr>
+   Название: {{ object.title }} <hr>
+   Аннотация: {{ object.annotacion }}
+  </div>
 {% endblock content %} 
