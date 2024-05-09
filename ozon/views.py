@@ -4,6 +4,7 @@ from .forms import OzonForm
 from .models import Ozon
 from utils.ozon.barcode_gen import barcode_gen, barcode_set
 
+
 SET_BARCODS = barcode_set
 
 
@@ -30,3 +31,4 @@ class XlFormListView(ListView):
     model = Ozon
     ordering = '-id'
     paginate_by = 10
+

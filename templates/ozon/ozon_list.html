@@ -6,8 +6,10 @@
 Лента
 {% for post in page_obj %}
     <p>{{post.title}} 
-    </p>
     {{post.barcode}}
+    <br><a href="{% url 'ozon:edit' post.id %}">Редактировать</a>
+    <a href="{% url 'ozon:detail' post.id %}">Детали</a>
+    </p>
     <hr>
 {% endfor %} 
 {%include "includes/paginator.html" %}
