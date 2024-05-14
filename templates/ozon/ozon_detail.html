@@ -15,7 +15,7 @@
    <hr>
    Название: {{ object.title }} <hr>
    Аннотация: {{ object.annotacion }} <hr>
-    <a class="btn btn-success btn-sm" href="http://127.0.0.1:8000/{{object.xcel_shablon}}" download>Скачать шаблон</a>
+    <a class="btn btn-success btn-sm" href="{% url 'pages:home' %}{{object.xcel_shablon}}"  download>Скачать шаблон</a>
     <a class="btn btn-primary btn-sm" href="{% url 'ozon:edit' object.id %}">Редактировать</a>
   </div>
 {% endblock content %}

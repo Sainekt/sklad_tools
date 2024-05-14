@@ -31,4 +31,3 @@ class XlFormListView(ListView):
     model = Ozon
     ordering = '-id'
     paginate_by = 10
-
