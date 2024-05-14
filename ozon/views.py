@@ -1,5 +1,7 @@
 from django.views.generic import CreateView, DetailView, UpdateView, ListView
-from django.shortcuts import render
+from django.shortcuts import redirect
+
+import pyperclip
 
 from .forms import OzonForm
 from .models import Ozon
@@ -16,7 +18,6 @@ class XlFormCreateView(CreateView):
     def form_valid(self, form):
         if form.instance.barcode is None:
             form.instance.barcode = barcode_gen(SET_BARCODS)
-        value = form.instance
         # choice_file_xl(form.instance.xcel_shablon)
         return super().form_valid(form)
 
@@ -37,7 +38,19 @@ class XlFormListView(ListView):
 
 
 def edit_xl(request, pk):
-    template = 'ozon/ozon_detail.html'
     info = Ozon.objects.get(id=pk)
-    context = {'object': info}
-    return render(request, template, context=context)
+    on_confirm(
+        info.title,
+        info.article,
+        info.barcode,
+        info.annotacion,
+        info.model_list,
+        info.price,
+        info.length,
+        info.width,
+        info.height,
+        info.weight,
+    )
+    pyperclip.copy(info.barcode)
+    excel_edit(choice_file_xl(info.xcel_shablon))
+    return redirect('ozon:detail', pk=info.id)
