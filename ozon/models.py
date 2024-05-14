@@ -16,6 +16,7 @@ class Ozon(models.Model):
     length = models.IntegerField('Длина упаковки мм.', default=180)
     width = models.IntegerField('Ширина упаковки мм.', default=120)
     height = models.IntegerField('Высота упаковки мм.', default=100)
+    weight = models.IntegerField('вес', default=200)
     annotacion = models.TextField('Аннотация', max_length=5000)
     model_list = models.TextField(
         'Список совместимых устройств', max_length=5000

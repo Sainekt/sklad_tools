@@ -17,5 +17,6 @@
    Аннотация: {{ object.annotacion }} <hr>
     <a class="btn btn-success btn-sm" href="{% url 'pages:home' %}{{object.xcel_shablon}}"  download>Скачать шаблон</a>
     <a class="btn btn-primary btn-sm" href="{% url 'ozon:edit' object.id %}">Редактировать</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'ozon:edit_xl' object.id %}">edit_xl</a>
   </div>
 {% endblock content %}

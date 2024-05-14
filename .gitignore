@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+media/
+ozon/__pycache__/
 
 # C extensions
 *.so
