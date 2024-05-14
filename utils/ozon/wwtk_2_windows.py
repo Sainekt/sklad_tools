@@ -20,7 +20,6 @@ def excel_edit(xl_file_name):
     # Получаем больше информации для заполнения
     more_info_list = more_info(annotacion)
     # открываем книгу.
-    print(xl_file_name[0])
     book = openpyxl.load_workbook(xl_file_name[0], data_only=False)
     try:
         sheet = book.worksheets[4]  # обращаемся к 5-ому листу в шаблоне OZON

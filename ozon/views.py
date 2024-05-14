@@ -17,8 +17,10 @@ class XlFormCreateView(CreateView):
 
     def form_valid(self, form):
         if form.instance.barcode is None:
-            form.instance.barcode = barcode_gen(SET_BARCODS)
-        # choice_file_xl(form.instance.xcel_shablon)
+            barcode = barcode_gen(SET_BARCODS)
+            form.instance.barcode = barcode
+        if form.instance.article is None:
+            form.instance.article = barcode
         return super().form_valid(form)
 
 

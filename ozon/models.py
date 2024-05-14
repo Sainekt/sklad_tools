@@ -8,10 +8,13 @@ class Ozon(models.Model):
     title = models.CharField(
         'Наименование', max_length=settings.DEFAULT_CHAR_LENGTH)
     article = models.CharField(
-        'Артикул', max_length=settings.DEFAULT_CHAR_LENGTH)
+        'Артикул', max_length=settings.DEFAULT_CHAR_LENGTH,
+        null=True, blank=True,
+    )
     barcode = models.CharField(
         'Штрих-код', max_length=settings.DEFAULT_CHAR_LENGTH,
-        null=True, blank=True)
+        null=True, blank=True
+    )
     price = models.IntegerField('Цена руб.', default=10000)
     length = models.IntegerField('Длина упаковки мм.', default=180)
     width = models.IntegerField('Ширина упаковки мм.', default=120)
@@ -24,4 +27,4 @@ class Ozon(models.Model):
     xcel_shablon = models.FileField('XL шаблон', upload_to='ozon_shablons')
 
     def get_absolute_url(self):
-        return reverse("ozon:detail", kwargs={"pk": self.pk})
+        return reverse("ozon:edit_xl", kwargs={"pk": self.pk})
