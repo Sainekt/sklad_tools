@@ -64,9 +64,11 @@ def excel_edit(xl_file_name):
                     sheet[4][count].value = visota
                 elif cell.value == 'Бренд*':
                     sheet[4][count].value = 'EUROZIP'
-                elif cell.value == 'Название модели (для объединения в одну карточку)*':
+                elif (cell.value == 'Название модели '
+                      '(для объединения в одну карточку)*'):
                     sheet[4][count].value = articule
-                elif cell.value == 'Страна-изготовитель*' or cell.value == 'Страна-изготовитель':
+                elif (cell.value == 'Страна-изготовитель*'
+                      or cell.value == 'Страна-изготовитель'):
                     sheet[4][count].value = 'Италия'
                 elif cell.value == 'Партномер':
                     sheet[4][count].value = articule
@@ -82,11 +84,14 @@ def excel_edit(xl_file_name):
                     sheet[4][count].value = '1'
                 elif cell.value == 'Тип*':
                     sheet[4][count].value = xl_file_name[1]
-                elif cell.value == 'Количество в упаковке, шт' or cell.value == 'Количество в упаковке, шт*':
+                elif (cell.value == 'Количество в упаковке, шт'
+                      or cell.value == 'Количество в упаковке, шт*'):
                     sheet[4][count].value = '1'
-                elif cell.value == 'Класс опасности товара' or cell.value == 'Класс опасности товара*':
+                elif (cell.value == 'Класс опасности товара'
+                      or cell.value == 'Класс опасности товара*'):
                     sheet[4][count].value = 'Не опасен'
-                elif cell.value == 'Единиц в одном товаре' or cell.value == 'Единиц в одном товаре*':
+                elif (cell.value == 'Единиц в одном товаре'
+                      or cell.value == 'Единиц в одном товаре*'):
                     sheet[4][count].value = '1'
                 elif cell.value == 'Целевая аудитория':
                     sheet[4][count].value = 'Взрослая'
@@ -94,11 +99,13 @@ def excel_edit(xl_file_name):
                     sheet[4][count].value = '1800'
                 elif cell.value == 'Аннотация':
                     sheet[4][count].value = more_info_list[0][:6000]
-                elif cell.value == ('Список совместимых устройств' or cell.value == 'Предназначено для' or
-                                    cell.value == 'Совместимые модели минимоек'):
+                elif (cell.value == 'Список совместимых устройств'
+                      or cell.value == 'Предназначено для'
+                      or cell.value == 'Совместимые модели минимоек'):
                     sheet[4][count].value = model_list
                 elif cell.value == 'Поддерживаемые бренды':
-                    if 'DeLonghi' in more_info_list[1] or 'Delonghi' in more_info_list[1]:
+                    if ('DeLonghi' in more_info_list[1]
+                            or 'Delonghi' in more_info_list[1]):
                         delonghi = ';'.join(more_info_list[1])
                         delonghi = delonghi.replace('Delonghi', "De'Longhi")
                         delonghi = delonghi.replace('DeLonghi', "De'Longhi")
@@ -110,7 +117,8 @@ def excel_edit(xl_file_name):
                     sheet[4][count].value = ';'.join(more_info_list[2])
                 elif cell.value == 'Цвет товара':
                     sheet[4][count].value = ';'.join(more_info_list[3])
-                elif cell.value == 'Вид запчасти' or cell.value == 'Вид аксессуара бытовой техники':
+                elif (cell.value == 'Вид запчасти'
+                      or cell.value == 'Вид аксессуара бытовой техники'):
                     sheet[4][count].value = more_info_list[4]
                 elif cell.value == 'Ключевые слова':
                     sheet[4][count].value = ';'.join(more_info_list[5])
@@ -130,7 +138,7 @@ def excel_edit(xl_file_name):
         book.save(str(save_file))
         book.close()
         print('Файл успешно заполнен.')
-    except:
+    except TypeError:
         print('Ошибка при создании файла')
         return 'error'
 
@@ -157,7 +165,10 @@ def more_info(annotacion):
             material_list = info[10:].split(', ')
         elif 'Цвет:' in info:
             color = info[6:].split(', ')
-        elif 'Длина:' in info or 'Ширина:' in info or 'Высота:' in info or 'Диаметр:' in info:
+        elif ('Длина:' in info
+              or 'Ширина:' in info
+              or 'Высота:' in info
+              or 'Диаметр:' in info):
             per = ''
             for el in info:
                 if el.isdigit():
@@ -198,7 +209,8 @@ def more_info(annotacion):
 
 def on_confirm(entry1, entry2, entry3, text1, text2, entry_price, en_dlinna,
                en_shirina, en_visota, en_massa):
-    global name, articule, barcode, annotacion, model_list, price, dlinna, shirina, visota, massa
+    global name, articule, barcode, annotacion, model_list, price, dlinna
+    global shirina, visota, massa
     name = entry1
     articule = entry2
     barcode = entry3
@@ -222,7 +234,7 @@ def choice_file_xl(file):
         file_name = file_name[-1]
         tip = file_name[:-5]
         return xl_file_name, tip
-    except:
+    except TypeError:
         print('Ошибка при выборе файла!')
 
 
@@ -246,15 +258,22 @@ def tn_ved_code(tip):
 
                    '8422901000 - Части посудомоечных машин',  # 2
 
-                   '7321900000 - Части к кухонным устройствам для приготовления и подогрева пищи',  # 3
+                   '7321900000 - Части к кухонным устройствам для '
+                   'приготовления и подогрева пищи',  # 3
                    )
 
-        dikt_code = {'Запчасть для водонагревателя': cartage[0], 'Запчасть для обогревателя': cartage[0],
-                     'Запчасть для стиральной машины': cartage[1], 'Запчасть для посудомоечной машины': cartage[2],
-                     'Запчасть для кофемашины': cartage[3], 'Запчасть для СВЧ': cartage[3],
-                     'Аксессуар для кофемашины': cartage[3], 'Аксессуар для кофеварки': cartage[3],
-                     'Запчасть для кухонного комбайна': cartage[3], 'Запчасть для кофеварки': cartage[3],
-                     }
+        dikt_code = {
+            'Запчасть для водонагревателя': cartage[0],
+            'Запчасть для обогревателя': cartage[0],
+            'Запчасть для стиральной машины': cartage[1],
+            'Запчасть для посудомоечной машины': cartage[2],
+            'Запчасть для кофемашины': cartage[3],
+            'Запчасть для СВЧ': cartage[3],
+            'Аксессуар для кофемашины': cartage[3],
+            'Аксессуар для кофеварки': cartage[3],
+            'Запчасть для кухонного комбайна': cartage[3],
+            'Запчасть для кофеварки': cartage[3],
+        }
 
         return dikt_code[tip]
     except KeyError:

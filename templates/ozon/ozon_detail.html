@@ -8,10 +8,13 @@
     ID записи: {{ object.id }}
   </div>
   <div class="card-body text-white bg-dark mb-3">
-    Штрих-код <br> {{ object.barcode }}
+    Штрих-код: <br> {{ object.barcode }}
     <hr>
-    Наименование: {{ object.title }} <hr>
-    Аннотация: {{ object.annotacion }} <br>
+    Наименование:<br> {{ object.title }} <hr>
+    Аннотация:<br> {{ object.annotacion }} <br>
+    <hr>
+    Список моделей:<br>
+    {{ object.model_list }}
   </div>
 </div>
     <a class="btn btn-success btn-sm" href="{% url 'pages:home' %}{{object.xcel_shablon}}"  download>Скачать шаблон</a>

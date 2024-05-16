@@ -1,12 +1,16 @@
+from typing import Any
+from django.db.models.base import Model as Model
+from django.db.models.query import QuerySet
 from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.shortcuts import redirect
 
 import pyperclip
 
-from .forms import OzonForm
+from .forms import OzonForm, Formating
 from .models import Ozon
 from utils.ozon.barcode_gen import barcode_gen, barcode_set
 from utils.ozon.wwtk_2_windows import on_confirm, excel_edit, choice_file_xl
+from utils.ozon import format_string as formating
 
 SET_BARCODS = barcode_set
 
@@ -14,6 +18,7 @@ SET_BARCODS = barcode_set
 class XlFormCreateView(CreateView):
     model = Ozon
     form_class = OzonForm
+    text = None
 
     def form_valid(self, form):
         if form.instance.barcode is None:
@@ -22,6 +27,18 @@ class XlFormCreateView(CreateView):
         if form.instance.article is None:
             form.instance.article = barcode
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET:
+            if 'model_list_zipcom' in self.request.GET:
+                self.text = formating.model_list_zipcom(
+                    self.request.GET['text']
+                )
+
+        formater = Formating(initial={'text': self.text})
+        context["form_formatter"] = formater
+        return context
 
 
 class XlFormDetailView(DetailView):

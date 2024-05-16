@@ -20,11 +20,14 @@ class Ozon(models.Model):
     width = models.IntegerField('Ширина упаковки мм.', default=120)
     height = models.IntegerField('Высота упаковки мм.', default=100)
     weight = models.IntegerField('вес', default=200)
-    annotacion = models.TextField('Аннотация', max_length=5000)
+    annotacion = models.TextField('Аннотация', max_length=5000, default=
+"""Совместимость с брендом: 
+Материал: 
+Цвет: 
+""")
     model_list = models.TextField(
         'Список совместимых устройств', max_length=5000
     )
     xcel_shablon = models.FileField('XL шаблон', upload_to='ozon_shablons')
-
     def get_absolute_url(self):
         return reverse("ozon:edit_xl", kwargs={"pk": self.pk})
