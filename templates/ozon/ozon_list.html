@@ -3,14 +3,28 @@
 Лента  
 {% endblock %} 
 {% block content %}
-Лента
+<div class="card mb-3 col-6 card text-white bg-dark mb-3">
+    <div class="card-header text-white bg-dark mb-3 text-center">
+      История шаблонов
+    </div>
+
 {% for post in page_obj %}
-    <p>{{post.title}} 
-    {{post.barcode}}
-    <br><a href="{% url 'ozon:edit' post.id %}">Редактировать</a>
-    <a href="{% url 'ozon:detail' post.id %}">Детали</a>
+<div class="card-body ">
+    <div class="card-header mb-3">
+        Наименование: {{post.title}}
+      </div>
+      <div class="card-header mb-3">
+        Штрих-код {{post.barcode}}
+      </div>
+    
+    <p>
+    <a class="btn btn-light btn-sm" href="{% url 'ozon:edit' post.id %}">Редактировать</a>
+    <a class="btn btn-light btn-sm" href="{% url 'ozon:detail' post.id %}">Детали</a>
     </p>
     <hr>
+</div>
 {% endfor %} 
+
+</div>
 {%include "includes/paginator.html" %}
 {% endblock %}

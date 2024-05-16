@@ -3,20 +3,17 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-  {% if Ozon.image %}
-    <div>
-      <!-- Картинку сделаем побольше, чем на странице list/: высотой 200px -->
-      <img src="{{ Ozon.image.url }}" height="200">
-    </div>
-  {% endif %}
-  <div 'col-5'>
-   <h2>ID записи: {{ object.id }}</h2>
-   Баркод: {{ object.barcode }}
-   <hr>
-   Название: {{ object.title }} <hr>
-   Аннотация: {{ object.annotacion }} <hr>
-    <a class="btn btn-success btn-sm" href="{% url 'pages:home' %}{{object.xcel_shablon}}"  download>Скачать шаблон</a>
-    <a class="btn btn-primary btn-sm" href="{% url 'ozon:edit' object.id %}">Редактировать</a>
-    <a class="btn btn-primary btn-sm" href="{% url 'ozon:edit_xl' object.id %}">edit_xl</a>
+<div class="card mb-3 col-6 card text-white bg-dark mb-3">
+  <div class="card-header text-white bg-dark mb-3 text-center">
+    ID записи: {{ object.id }}
   </div>
+  <div class="card-body text-white bg-dark mb-3">
+    Штрих-код <br> {{ object.barcode }}
+    <hr>
+    Наименование: {{ object.title }} <hr>
+    Аннотация: {{ object.annotacion }} <br>
+  </div>
+</div>
+    <a class="btn btn-success btn-sm" href="{% url 'pages:home' %}{{object.xcel_shablon}}"  download>Скачать шаблон</a>
+    <a class="btn btn-dark btn-sm" href="{% url 'ozon:edit' object.id %}">Редактировать</a>
 {% endblock content %}
