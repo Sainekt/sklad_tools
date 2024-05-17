@@ -14,8 +14,9 @@ class OzonForm(forms.ModelForm):
 
 
 class Formating(forms.Form):
-    brand = forms.CharField(label='Брэнд')
-    sep = forms.CharField(label='Разделитель')
+    brand = forms.CharField(label='Брэнд', required=False)
+    sep = forms.CharField(label='Разделитель', required=False)
     text = forms.CharField(label='Текст', widget=forms.Textarea(
         {'cols': '22', 'rows': '5'}), required=False,
+        help_text='Будет помещено в основную таблицу при отправке данных.'
     )

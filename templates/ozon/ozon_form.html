@@ -8,63 +8,44 @@
 {% block content %}
 <a class="btn btn text-muted" href="{% url 'ozon:list' %}">Список обработанных шаблонов</a>
 <br><br>
-<div class="card text-white bg-dark mb-3 text-center col-6">
-  <div class="card-header">
-    Шаблон OZON
-  </div>
-  <div class="card-body">
-  <form method='post' enctype="multipart/form-data" id='form1'>
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% bootstrap_button button_type="submit" content="Отправить" %}
-  </div>
-  </form>
-</div>
 
-<div>
-<form method='GET' id="form2">
-  {% bootstrap_form form_formatter %}
-  {% bootstrap_button button_type="submit" content="1" name="one" %}
-  {% bootstrap_button button_type="submit" content="2" name="model_list_zipcom" %}
-  {% bootstrap_button button_type="submit" content="3" name="three" %}
-  {% bootstrap_button button_type="submit" content="4" name="four" %}
-  {% bootstrap_button button_type="submit" content="5" name="five" %}
-</form>
-</div>
-  {% comment %} {% with data=form.instance %}
-    {% if "/edit/" in request.path %}
-      <h2>Редактировать заявку {{ data.pk }}</h2>
-    {% elif "/delete/" in request.path %}
-      <h2>Удалить заявку {{ data.pk }}</h2>
-    {% else %}
-      <h2>Подать заявку</h2>
-    {% endif %}
-    <div class="card col-4">
+<div class="row">
+  <div class="col-md-6">
+    <div class="card text-white bg-dark mb-3 text-center">
       <div class="card-header">
-        Конкурс мороженого
+        Шаблон OZON
       </div>
       <div class="card-body">
-        <form method="post">
+        <form method='post' enctype="multipart/form-data" id='form1'>
           {% csrf_token %}
-          {% if not "/delete/" in request.path %}
-            {% bootstrap_form form %}
-          {% else %}
-            <p>{{ data.title }}</p>
-            <p>{{ data.price }}</p>
-            <p>{{ data.description }}</p>
-            <p>{{ data.comment }}</p>
-          {% endif %}
+          {% bootstrap_form form %}
+          <div class="btn-group-vertical w-100"> 
           {% bootstrap_button button_type="submit" content="Отправить" %}
+          </div>
         </form>
       </div>
     </div>
-    {% if form.is_valid %}
-      <h2>Рецепт мороженого {{ data.title }} принят на конкурс!</h2>
-      <div>Номер заявки: {{ data.id }}</div>
-    {% endif %}
-  {% endwith %}
-  <hr>
-  <div>
-    <a href="{% url 'contest:list' %}">Список всех заявок</a>
-  </div> {% endcomment %}
+  </div>
+  <div class="col-md-6">
+    <div class="card text-white bg-dark mb-3 text-center">
+      <div class="card-header">
+        Форматирование списка моделей
+      </div>
+      <div class="card-body">
+        <form method='post' id="form2">
+          {% csrf_token %}
+          {% bootstrap_form form_formatter %}
+          <div class="btn-group-vertical w-100"> 
+            {% bootstrap_button button_type="submit" content="Вставить по разделителю" name="button" value="1" %}
+            {% bootstrap_button button_type="submit" content="Zipcom" name="button" value="2" %}
+            {% bootstrap_button button_type="submit" content="Удаление лишних переносов" name="button" value="3" %}
+            {% bootstrap_button button_type="submit" content="Удалить брэнды" name="button" value="4" %}
+            {% bootstrap_button button_type="submit" content="Доктор Кофемашин" name="button" value="5" %}
+            {% bootstrap_button button_type="submit" content="Fiuo" name="button" value="6" %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

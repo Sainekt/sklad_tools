@@ -1,6 +1,3 @@
-from typing import Any
-from django.db.models.base import Model as Model
-from django.db.models.query import QuerySet
 from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.shortcuts import redirect
 
@@ -14,7 +11,6 @@ from utils.ozon import format_string as formating
 
 SET_BARCODS = barcode_set
 
-
 class XlFormCreateView(CreateView):
     model = Ozon
     form_class = OzonForm
@@ -26,17 +22,26 @@ class XlFormCreateView(CreateView):
             form.instance.barcode = barcode
         if form.instance.article is None:
             form.instance.article = barcode
+        if form.instance.model_list is None and self.text:
+            form.instance.model_list = self.text
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.GET:
-            if 'model_list_zipcom' in self.request.GET:
-                self.text = formating.model_list_zipcom(
-                    self.request.GET['text']
-                )
-
-        formater = Formating(initial={'text': self.text})
+        self.brand, self.sep = formating.get_Separation()
+        if self.request.POST:
+            self.text = get_format_strgin(
+                number=self.request.POST['button'],
+                text=self.request.POST['text'],
+                brand=self.request.POST['brand'],
+                sep=self.request.POST['sep']
+            )
+        formater = Formating(
+            initial={
+                'text': self.text,
+                'brand': self.brand,
+                'sep': self.sep}
+        )
         context["form_formatter"] = formater
         return context
 
@@ -48,6 +53,18 @@ class XlFormDetailView(DetailView):
 class XlFormUpdateView(UpdateView):
     model = Ozon
     form_class = OzonForm
+    text = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET:
+            if 'model_list_zipcom' in self.request.GET:
+                self.text = formating.model_list_zipcom(
+                    self.request.GET['text']
+                )
+        formater = Formating(initial={'text': self.text})
+        context["form_formatter"] = formater
+        return context
 
 
 class XlFormListView(ListView):
@@ -73,3 +90,17 @@ def edit_xl(request, pk):
     pyperclip.copy(info.barcode)
     excel_edit(choice_file_xl(info.xcel_shablon))
     return redirect('ozon:detail', pk=info.id)
+
+
+def get_format_strgin(number, text, brand=None, sep=None):
+    funcs = {
+        '1': formating.brands_by_sep,
+        '2': formating.model_list_zipcom,
+        '3': formating.del_enter,
+        '4': formating.del_brand,
+        '5': formating.model_list_doc_cm,
+        '6': formating.fiyo,
+    }
+    if number == '1':
+        return funcs[number](brand=brand, separation=sep, text=text)
+    return funcs[number](text)

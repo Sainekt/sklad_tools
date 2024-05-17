@@ -1,14 +1,33 @@
-import pyperclip  # type: ignore
-brands = {'amica', 'zanussi', 'moulinex', 'aeg', 'hotpoint-ariston', 'privileg', 'bauknecht', 'constructa', 'rotel',
-          'beko', 'kenwood', 'electrolux', 'tefal', 'siemens', 'miele', 'melitta', 'gorenje', 'bosch', 'philips',
-          'krups', 'whirlpool', 'lg', 'dolce gusto', 'saeco', 'braun', 'nivona', 'indesit', 'samsung', 'ariston',
-          'rowenta', 'philips-saeco', 'maytag', 'jura', 'delonghi', 'spidem', 'gaggia', 'smeg', 'kitchenaid', 'delfa',
-          'hansa', 'zelmer', 'bifinett', 'nespresso'}
+import os
+
+from django.conf import settings
 
 
-def pyperclip_f(brand, separation, text):  # Проставляем бренды в списке моделей без брендов \\ 1
+brands = {
+    'amica', 'zanussi', 'moulinex', 'aeg', 'hotpoint-ariston', 'privileg',
+    'bauknecht', 'constructa', 'rotel', 'beko', 'kenwood', 'electrolux',
+    'tefal', 'siemens', 'miele', 'melitta', 'gorenje', 'bosch', 'philips',
+    'krups', 'whirlpool', 'lg', 'dolce gusto', 'saeco', 'braun', 'nivona',
+    'indesit', 'samsung', 'ariston', 'rowenta', 'philips-saeco', 'maytag',
+    'jura', 'delonghi', 'spidem', 'gaggia', 'smeg', 'kitchenaid', 'delfa',
+    'hansa', 'zelmer', 'bifinett', 'nespresso'
+}
+
+file_path = os.path.join(settings.BASE_DIR, 'utils', 'ozon', 'mem.txt')
+
+
+def get_Separation():
+    with open(file_path, 'r') as get_info:
+        information = get_info.readlines()
+        brand, separation = [i.rstrip('\n') for i in information]
+        return brand, separation
+
+
+# Проставляем бренды в списке моделей без брендов \\ 1
+def brands_by_sep(brand, separation, text):
     string = text
     new_string = ''
+    print(brand)
     for el in string.split(separation if separation != 'n' else '\n'):
         if el == '':
             continue
@@ -17,7 +36,7 @@ def pyperclip_f(brand, separation, text):  # Проставляем бренды
             continue
         new_string += f'{el}\n'
 
-    with open('format_stringer//mem.txt', 'w') as write_info:
+    with open(file_path, 'w') as write_info:
         write_info.write(f'{brand}\n{separation}')
 
     return new_string
