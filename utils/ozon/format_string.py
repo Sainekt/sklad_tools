@@ -27,7 +27,6 @@ def get_Separation():
 def brands_by_sep(brand, separation, text):
     string = text
     new_string = ''
-    print(brand)
     for el in string.split(separation if separation != 'n' else '\n'):
         if el == '':
             continue

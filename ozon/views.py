@@ -11,6 +11,7 @@ from utils.ozon import format_string as formating
 
 SET_BARCODS = barcode_set
 
+
 class XlFormCreateView(CreateView):
     model = Ozon
     form_class = OzonForm
