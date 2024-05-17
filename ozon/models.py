@@ -3,6 +3,11 @@ from django.urls import reverse
 
 from sklad_tools import settings
 
+annotacion_text = ("""Совместимость с брендом: 
+Материал: 
+Цвет: """
+)
+
 
 class Ozon(models.Model):
     title = models.CharField(
@@ -20,11 +25,8 @@ class Ozon(models.Model):
     width = models.IntegerField('Ширина упаковки мм.', default=120)
     height = models.IntegerField('Высота упаковки мм.', default=100)
     weight = models.IntegerField('вес', default=200)
-    annotacion = models.TextField('Аннотация', max_length=5000, default=
-"""Совместимость с брендом: 
-Материал: 
-Цвет: 
-""")
+    annotacion = models.TextField(
+        'Аннотация', max_length=5000, default=annotacion_text)
     model_list = models.TextField(
         'Список совместимых устройств', max_length=5000
     )

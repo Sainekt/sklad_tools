@@ -1,12 +1,28 @@
 {% extends "base.html" %}
+{% load django_bootstrap5 %}
 {% block title %}
 {{ post.title }} | {% if post.location and post.location.is_published %}{{ post.location.name }} |{% endif %} {{ post.pub_date|date:"d E Y" }}
 {% endblock %}
 {% block content %}
-  <article>
-    <p>{{ post.pub_date|date:"d E Y" }} | {% if post.location and post.location.is_published %}{{ post.location.name }}{% else %}Планета Земля{% endif %}<br>
-      <small>От автора @{{ post.author.username }} в категории {% include "includes/category_link.html" %}</small></p>
-    <h3>{{ post.title }}</h3>
-    <p>{{ post.text|linebreaksbr }}</p>
-  </article> 
+<div class="col-md-6">
+  <div class="card text-white bg-dark mb-3 text-center">
+    <div class="card-header">
+      Форматирование списка моделей
+    </div>
+    <div class="card-body">
+      <form method='post' id="form2">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <div class="btn-group-vertical w-100"> 
+          {% bootstrap_button button_type="submit" content="Вставить по разделителю" name="button" value="1" %}
+          {% bootstrap_button button_type="submit" content="Zipcom" name="button" value="2" %}
+          {% bootstrap_button button_type="submit" content="Удаление лишних переносов" name="button" value="3" %}
+          {% bootstrap_button button_type="submit" content="Удалить брэнды" name="button" value="4" %}
+          {% bootstrap_button button_type="submit" content="Доктор Кофемашин" name="button" value="5" %}
+          {% bootstrap_button button_type="submit" content="Fiuo" name="button" value="6" %}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}

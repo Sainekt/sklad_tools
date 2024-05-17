@@ -13,7 +13,7 @@ class OzonForm(forms.ModelForm):
         }
 
 
-class Formating(forms.Form):
+class FormatingForm(forms.Form):
     brand = forms.CharField(label='Брэнд', required=False)
     sep = forms.CharField(label='Разделитель', required=False)
     text = forms.CharField(label='Текст', widget=forms.Textarea(
