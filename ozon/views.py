@@ -1,6 +1,7 @@
 from typing import Any
-from django.views.generic import CreateView, DetailView, UpdateView, ListView, FormView
+from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.shortcuts import redirect, render
+from django.views import View
 
 import pyperclip
 
@@ -57,33 +58,34 @@ class XlFormListView(ListView):
     paginate_by = 5
 
 
-class Formatter(FormView):
-    template_name = 'blog/detail.html'
-    form_class = FormatingForm
+class Formatter(View):
+    template_name = 'ozon/formatter.html'
     text = None
-    def form_valid(self, form):
-        form
-        return super().form_valid(form)
-    
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get(self, request):
         self.brand, self.sep = formating.get_Separation()
-        if self.request.POST:
-            self.text = get_format_strgin(
-                number=self.request.POST['button'],
-                text=self.request.POST['text'],
-                brand=self.request.POST['brand'],
-                sep=self.request.POST['sep']
-            )
+        form = FormatingForm(
+            initial={'text': self.text, 'brand': self.brand, 'sep': self.sep})
+        context = {'form': form}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        self.text = get_format_strgin(
+            number=self.request.POST['button'],
+            text=self.request.POST['text'],
+            brand=self.request.POST['brand'],
+            sep=self.request.POST['sep']
+        )
+        self.brand, self.sep = formating.get_Separation()
         form = FormatingForm(
             initial={
                 'text': self.text,
                 'brand': self.brand,
                 'sep': self.sep}
         )
-        context["form"] = form
-        return context
+        context = {'form': form}
+        return render(request, self.template_name, context)
+    
 
 
 
