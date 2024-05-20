@@ -109,3 +109,17 @@ def fiyo(text):
 
     result = '\n'.join(new_model_list)
     return result
+
+
+def get_format_strgin(number, text, brand=None, sep=None):
+    funcs = {
+        '1': brands_by_sep,
+        '2': model_list_zipcom,
+        '3': del_enter,
+        '4': del_brand,
+        '5': model_list_doc_cm,
+        '6': fiyo,
+    }
+    if number == '1':
+        return funcs[number](brand=brand, separation=sep, text=text)
+    return funcs[number](text)

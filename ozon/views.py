@@ -70,7 +70,7 @@ class Formatter(View):
         return render(request, self.template_name, context)
 
     def post(self, request):
-        self.text = get_format_strgin(
+        self.text = formating.get_format_strgin(
             number=self.request.POST['button'],
             text=self.request.POST['text'],
             brand=self.request.POST['brand'],
@@ -85,8 +85,6 @@ class Formatter(View):
         )
         context = {'form': form}
         return render(request, self.template_name, context)
-    
-
 
 
 def edit_xl(request, pk):
@@ -106,17 +104,3 @@ def edit_xl(request, pk):
     pyperclip.copy(info.barcode)
     excel_edit(choice_file_xl(info.xcel_shablon))
     return redirect('ozon:detail', pk=info.id)
-
-
-def get_format_strgin(number, text, brand=None, sep=None):
-    funcs = {
-        '1': formating.brands_by_sep,
-        '2': formating.model_list_zipcom,
-        '3': formating.del_enter,
-        '4': formating.del_brand,
-        '5': formating.model_list_doc_cm,
-        '6': formating.fiyo,
-    }
-    if number == '1':
-        return funcs[number](brand=brand, separation=sep, text=text)
-    return funcs[number](text)
