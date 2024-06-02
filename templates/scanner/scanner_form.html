@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  Сканим
+{% endblock %}
+
+{% block content %}
+<a class="btn btn text-muted" href="{% url 'ozon:list' %}">Список обработанных шаблонов</a>
+<br><br>
+
+<div class="row justify-content-center"> 
+  <div class="col-md-8">
+    <div class="card text-white bg-dark mb-3 text-center">
+      <div class="card-header">
+        Сканим
+      </div>
+      <div class="card-body">
+        <form method='post' enctype="multipart/form-data" id='form1'>
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          <div class="btn-group-vertical w-100"> 
+          {% bootstrap_button button_type="submit" content="Отправить" %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

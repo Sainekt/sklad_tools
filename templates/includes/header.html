@@ -25,6 +25,11 @@
               Форматирование строки
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link {% if view_name == 'scanner:main' %} active {% endif %}" href="{% url 'scanner:main' %}">
+              Сканер
+            </a>
+          </li>
         </ul>
       {% endwith %}      
     </div>

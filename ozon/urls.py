@@ -9,6 +9,6 @@ urlpatterns = [
     path("edit/<int:pk>/", views.XlFormUpdateView.as_view(), name="edit"),
     path('list/', views.XlFormListView.as_view(), name='list'),
     path('edit_xl/<int:pk>/', views.edit_xl, name='edit_xl'),
-    path('formatter/', views.Formatter.as_view(), name='formatter')
+    path('formatter/', views.Formatter.as_view(), name='formatter'),
 
 ]

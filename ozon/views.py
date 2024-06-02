@@ -1,4 +1,3 @@
-from typing import Any
 from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.shortcuts import redirect, render
 from django.views import View
@@ -8,7 +7,7 @@ import pyperclip
 from .forms import OzonForm, FormatingForm
 from .models import Ozon
 from utils.ozon.barcode_gen import barcode_gen, barcode_set
-from utils.ozon.wwtk_2_windows import on_confirm, excel_edit, choice_file_xl
+from utils.ozon.writer_ozon_form import on_confirm, excel_edit, choice_file_xl
 from utils.ozon import format_string as formating
 
 SET_BARCODS = barcode_set
