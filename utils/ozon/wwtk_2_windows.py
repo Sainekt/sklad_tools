@@ -1,4 +1,4 @@
-from os import path
+import os
 from django.conf import settings
 import openpyxl
 
@@ -83,7 +83,8 @@ def excel_edit(xl_file_name):
                 elif cell.value == 'Количество заводских упаковок':
                     sheet[4][count].value = '1'
                 elif cell.value == 'Тип*':
-                    sheet[4][count].value = xl_file_name[1]
+                    tipe = xl_file_name[1].replace('_', ' ')
+                    sheet[4][count].value = tipe
                 elif (cell.value == 'Количество в упаковке, шт'
                       or cell.value == 'Количество в упаковке, шт*'):
                     sheet[4][count].value = '1'
@@ -134,7 +135,7 @@ def excel_edit(xl_file_name):
                     sheet[4][count].value = more_info_list[8]
 
                 count += 1
-        save_file = path.join(xl_file_name[0])
+        save_file = os.path.join(xl_file_name[0])
         book.save(str(save_file))
         book.close()
         print('Файл успешно заполнен.')
@@ -226,7 +227,7 @@ def on_confirm(entry1, entry2, entry3, text1, text2, entry_price, en_dlinna,
 # Выбираем обрабатываемый файл, а так же берем наименование для сохранения.
 def choice_file_xl(file):
     try:
-        xl_file_name = path.join(
+        xl_file_name = os.path.join(
             settings.BASE_DIR, 'media')
         xl_file_name += '/' + str(file)
         file_name = xl_file_name.split('/')
@@ -278,3 +279,14 @@ def tn_ved_code(tip):
         return dikt_code[tip]
     except KeyError:
         return
+
+
+def clean_shablon_dir(file_name) -> None:
+    file_name = str(file_name).replace(' ', '_')
+    xl_file_name = os.path.join(
+        settings.BASE_DIR, 'media', 'ozon_shablons')
+    files = os.listdir(xl_file_name)
+    if file_name in files:
+
+        del_path = f'{xl_file_name}/{file_name}'
+        os.remove(del_path)
