@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}
+  Сканер
+{% endblock %}
+{% block content %}
+  <h1>Делай свои грязные дела и проваливай.</h1>
+  <a class="btn btn-light btn-sm" href="{% url 'scanner:pik' %}">Сканер</a>
+  <a class="btn btn-light btn-sm" href="{% url 'scanner:market_create' %}">Создать маркет</a>
+{% endblock %}

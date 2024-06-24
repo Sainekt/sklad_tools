@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pages.apps.PagesConfig',
     'ozon.apps.OzonConfig',
+    'scanner.apps.ScannerConfig',
     'django_bootstrap5',
 ]
 
