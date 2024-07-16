@@ -52,6 +52,10 @@ class XlFormUpdateView(UpdateView):
         context["form_formatter"] = formater
         return context
 
+    def form_valid(self, form):
+        clean_shablon_dir(form.instance.xcel_shablon)
+        return super().form_valid(form)
+
 
 class XlFormListView(ListView):
     model = Ozon

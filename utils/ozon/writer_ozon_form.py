@@ -34,6 +34,7 @@ def excel_edit(xl_file_name):
                 count += 1
         # проходим в сторону по 2 стоке всех заполненных колонок. максимально
         # до 50ой колонны.
+        type_groceries = xl_file_name[1].replace('_', ' ')
         for row in sheet.iter_rows(min_row=2, max_row=2, max_col=50):
             # счетчик для обращения к индексу обрабатываемой колонны.
             count = 0
@@ -83,7 +84,7 @@ def excel_edit(xl_file_name):
                 elif cell.value == 'Количество заводских упаковок':
                     sheet[4][count].value = '1'
                 elif cell.value == 'Тип*':
-                    tipe = xl_file_name[1].replace('_', ' ')
+                    tipe = type_groceries
                     sheet[4][count].value = tipe
                 elif (cell.value == 'Количество в упаковке, шт'
                       or cell.value == 'Количество в упаковке, шт*'):
@@ -129,8 +130,9 @@ def excel_edit(xl_file_name):
                     sheet[4][count].value = '1'
                 elif cell.value == 'Объем, мл':
                     sheet[4][count].value = more_info_list[7]
-                elif cell.value == 'ТН ВЭД коды ЕАЭС':
-                    sheet[4][count].value = tn_ved_code(xl_file_name[1])
+                elif (cell.value == 'ТН ВЭД коды ЕАЭС'
+                        or cell.value == 'ТН ВЭД коды ЕАЭС*'):
+                    sheet[4][count].value = tn_ved_code(type_groceries)
                 elif cell.value == 'Мощность, Вт':
                     sheet[4][count].value = more_info_list[8]
 
@@ -240,6 +242,7 @@ def choice_file_xl(file):
 
 
 def tn_ved_code(tip):
+    print(tip)
     try:
         cartage = ('8516900000 - Части электрические водонагревателей'
                    ' безынерционных или аккумулирующих, '
@@ -261,6 +264,14 @@ def tn_ved_code(tip):
 
                    '7321900000 - Части к кухонным устройствам для '
                    'приготовления и подогрева пищи',  # 3
+
+                   '8516320000 - Электрические водонагреватели безынерционные '
+                   'или аккумулирующие, электронагреватели погружные, '
+                   'электрооборудование обогрева пространства и обогрева '
+                   'грунта, электротермические аппараты для ухода за волосами '
+                   '(например, сушилки для волос, бигуди, щипцы для г '
+                   'аппараты электротермические для ухода за волосами или для '
+                   'сушки рук: аппараты для ухода за волосами прочие',  # 4
                    )
 
         dikt_code = {
@@ -274,8 +285,9 @@ def tn_ved_code(tip):
             'Аксессуар для кофеварки': cartage[3],
             'Запчасть для кухонного комбайна': cartage[3],
             'Запчасть для кофеварки': cartage[3],
+            'Насадка для фена': cartage[4],
         }
-
+        print(dikt_code[tip])
         return dikt_code[tip]
     except KeyError:
         return
