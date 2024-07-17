@@ -11,6 +11,7 @@ from utils.ozon.writer_ozon_form import (
     on_confirm, excel_edit, choice_file_xl, clean_shablon_dir
 )
 from utils.ozon import format_string as formating
+from utils.api.api import get_product
 
 SET_BARCODS = barcode_set
 
@@ -106,6 +107,12 @@ def edit_xl(request, pk):
         info.height,
         info.weight,
     )
+    get_product(
+        info.article,
+        info.title,
+        info.barcode,
+    )
+
     pyperclip.copy(info.barcode)
     excel_edit(choice_file_xl(info.xcel_shablon))
     return redirect('ozon:detail', pk=info.id)

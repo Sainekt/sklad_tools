@@ -242,7 +242,6 @@ def choice_file_xl(file):
 
 
 def tn_ved_code(tip):
-    print(tip)
     try:
         cartage = ('8516900000 - Части электрические водонагревателей'
                    ' безынерционных или аккумулирующих, '
@@ -286,8 +285,9 @@ def tn_ved_code(tip):
             'Запчасть для кухонного комбайна': cartage[3],
             'Запчасть для кофеварки': cartage[3],
             'Насадка для фена': cartage[4],
+            'Насадка для стайлера': cartage[4],
+
         }
-        print(dikt_code[tip])
         return dikt_code[tip]
     except KeyError:
         return
