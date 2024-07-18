@@ -32,6 +32,9 @@ class Ozon(models.Model):
         'Список совместимых устройств', max_length=5000
     )
     xcel_shablon = models.FileField('XL шаблон', upload_to='ozon_shablons')
+    image = models.FileField(
+        "Фото", upload_to='foto', null=True, blank=True
+    )
 
     def get_absolute_url(self):
         return reverse("ozon:edit_xl", kwargs={"pk": self.pk})

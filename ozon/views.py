@@ -107,12 +107,13 @@ def edit_xl(request, pk):
         info.height,
         info.weight,
     )
+
     get_product(
         info.article,
         info.title,
         info.barcode,
+        info.image,
     )
-
     pyperclip.copy(info.barcode)
     excel_edit(choice_file_xl(info.xcel_shablon))
     return redirect('ozon:detail', pk=info.id)
