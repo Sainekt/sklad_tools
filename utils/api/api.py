@@ -2,12 +2,14 @@ import requests
 import json
 import os
 import base64
-
+from dotenv import load_dotenv
 from django.conf import settings
-from env import token
+
+load_dotenv()
+TOKEN = os.getenv('token')
 
 HEADERS = {
-    'Authorization': f'Bearer {token}',
+    'Authorization': f'Bearer {TOKEN}',
     'Content-type': 'application/json'
 }
 

@@ -30,6 +30,11 @@
               Сканер
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link {% if view_name == 'purchaseorder:main' %} active {% endif %}" href="{% url 'purchaseorder:main' %}">
+              Заказы поставщикам
+            </a>
+          </li>
         </ul>
       {% endwith %}      
     </div>

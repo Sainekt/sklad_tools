@@ -9,4 +9,5 @@ urlpatterns = [
     path('', include('pages.urls')),
     path('ozon/', include('ozon.urls')),
     path('scanner/', include('scanner.urls')),
+    path('purchaseorder/', include('purchaseorder.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

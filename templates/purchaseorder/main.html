@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}
+  Сканер
+{% endblock %}
+{% block content %}
+  <h1>Делай свои грязные дела и проваливай.</h1>
+  {% for i in order_list %}
+  {{ i.name }} {{ i.created }} {{ i.sum }} {{i.positions.meta.href}}<br>
+
+  {% endfor %}
+{% endblock %}
