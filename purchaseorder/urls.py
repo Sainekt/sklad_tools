@@ -5,5 +5,5 @@ app_name = 'purchaseorder'
 
 urlpatterns = [
     path('', views.OrderList.as_view(), name='main'),
-    # path('pik/', views.ScannerCreate.as_view(), name='order'),
+    path('order/<slug:slug>/', views.OrderPositions.as_view(), name='order'),
 ]

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}
+  Сканер
+{% endblock %}
+{% block content %}
+  {% comment %} <h1>Позиции в заказе. {{number}} </h1> {% endcomment %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Название</th>
+        <th scope="col">Код</th>
+        <th scope="col">Баркоды</th>
+        <th scope="col">Заказано шт</th>
+        <th scope="col">Сумма Руб</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in context %}
+      <tr>
+        <td>{{ i.assortment.name }}</td>
+        <td>{{ i.assortment.code }}</td>
+        <td>{{ i.assortment.barcodes }}</td>
+        <td>{{ i.quantity }}</td>
+        <td>{{ i.price|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

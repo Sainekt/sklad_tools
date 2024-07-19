@@ -4,8 +4,26 @@
 {% endblock %}
 {% block content %}
   <h1>Делай свои грязные дела и проваливай.</h1>
-  {% for i in order_list %}
-  {{ i.name }} {{ i.created }} {{ i.sum }} {{i.positions.meta.href}}<br>
-
-  {% endfor %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Название</th>
+        <th scope="col">Агент</th>
+        <th scope="col">Сумма Руб</th>
+        <th scope="col">Дата создания</th>
+        <th scope="col">Просмотр</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in order_list %}
+      <tr>
+        <td>{{ i.name }}</td>
+        <td>{{ i.agent.name }}</td>
+        <td>{{ i.sum|floatformat:2 }}</td>
+        <td>{{ i.created }}</td>
+        <td><a class="btn btn-secondary btn-sm" href="{% url 'purchaseorder:order' i.id %}">Открыть</td></a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
