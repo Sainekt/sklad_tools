@@ -7,6 +7,8 @@ from django.views import generic
 load_dotenv()
 
 TOKEN = os.getenv('token')
+if not TOKEN:
+    raise ValueError('Требуется токен Моего скалада.')
 
 HEADERS = {
     'Authorization': f'Bearer {TOKEN}',
@@ -29,7 +31,8 @@ class OrderList(generic.TemplateView):
         return context
 
     def get_order_list(self):
-        url = 'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder?order=created,desc'
+        url = ('https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder'
+               '?order=created,desc')
         response = self.response(url)
         self.order_list = response.json()['rows']
 
