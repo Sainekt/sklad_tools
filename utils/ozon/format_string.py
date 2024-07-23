@@ -10,7 +10,7 @@ brands = {
     'krups', 'whirlpool', 'lg', 'dolce gusto', 'saeco', 'braun', 'nivona',
     'indesit', 'samsung', 'ariston', 'rowenta', 'philips-saeco', 'maytag',
     'jura', 'delonghi', 'spidem', 'gaggia', 'smeg', 'kitchenaid', 'delfa',
-    'hansa', 'zelmer', 'bifinett', 'nespresso'
+    'hansa', 'zelmer', 'bifinett', 'nespresso', 'franke'
 }
 
 file_path = os.path.join(settings.BASE_DIR, 'utils', 'ozon', 'mem.txt')
@@ -78,15 +78,14 @@ def del_brand(text):  # Удаляем бренды из списка модел
 
 def model_list_doc_cm(text):
     model_list = text.split('\n')
-    result: str = ''
-    model_actual: str = ''
-    for model in model_list:
-        if model == '':
+    result = ''
+    for i in model_list:
+        if i.lower().rstrip() in brands:
+            model = i.rstrip()
             continue
-        elif model.lower() in brands:
-            model_actual = model.capitalize()
+        if i == '\r':
             continue
-        result += f'{model_actual} {model}\n'
+        result += f'{model.capitalize()} {i}'
     return result
 
 
