@@ -11,6 +11,9 @@ class OzonForm(forms.ModelForm):
         widgets = {
             'annotacion': forms.Textarea({'cols': '22', 'rows': '5'}),
             'model_list': forms.Textarea({'cols': '22', 'rows': '5'}),
+            'image': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
+            'xcel_shablon': forms.ClearableFileInput(
+                attrs={'accept': '.xlsx'}),
         }
 
     def clean_xcel_shablon(self):
@@ -18,6 +21,16 @@ class OzonForm(forms.ModelForm):
         if '.xlsx' not in file.name:
             raise ValidationError('Ожидается файл формата xlsx')
         return file
+    
+    def clean_image(self):
+        image_formats = [
+            'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp'
+        ]
+        file = self.cleaned_data.get('image')
+        if file:
+            if file.name.split('.')[-1] not in image_formats:
+                raise ValidationError('Ожидается изображение.')
+            return file
 
 
 class FormatingForm(forms.Form):

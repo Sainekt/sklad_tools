@@ -4,7 +4,7 @@ from django.urls import reverse
 from sklad_tools import settings
 
 annotacion_text = (
-    """Совместимость с брендом:
+    """Совместимость с брендом: 
 Материал: 
 Цвет: """
 )

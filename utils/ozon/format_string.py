@@ -95,9 +95,10 @@ def fiyo(text):
     actual_brand = ''
     count = 0
     for model in model_list:
-        if model.lower() in brands:
-            if actual_brand != model:
-                actual_brand = model
+        brand = model.lower().split()[0]
+        if brand in brands:
+            if actual_brand != brand:
+                actual_brand = brand
             count += 1
             continue
         if actual_brand and count == 1:
