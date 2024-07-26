@@ -21,7 +21,7 @@ class OzonForm(forms.ModelForm):
         if '.xlsx' not in file.name:
             raise ValidationError('Ожидается файл формата xlsx')
         return file
-    
+
     def clean_image(self):
         image_formats = [
             'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp'

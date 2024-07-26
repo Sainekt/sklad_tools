@@ -90,24 +90,7 @@ def model_list_doc_cm(text):
 
 
 def fiyo(text):
-    model_list = text.split('\n')
-    new_model_list = []
-    actual_brand = ''
-    count = 0
-    for model in model_list:
-        brand = model.lower().split()[0]
-        if brand in brands:
-            if actual_brand != brand:
-                actual_brand = brand
-            count += 1
-            continue
-        if actual_brand and count == 1:
-            new_model = f'{actual_brand.capitalize()} {model}'
-            if new_model not in new_model_list:
-                new_model_list.append(new_model)
-        count = 0
-
-    result = '\n'.join(new_model_list)
+    result = text.replace('\t', ' ')
     return result
 
 
