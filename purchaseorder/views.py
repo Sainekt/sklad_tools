@@ -1,9 +1,10 @@
 import os
 from dotenv import load_dotenv
 import requests
+from django.shortcuts import redirect, render
 import json
 
-from django.views import generic
+from django.views import generic, View
 
 load_dotenv()
 
@@ -22,7 +23,7 @@ PARAMS = (('limit', 50),)
 # from .forms import ScannerForm, MarketForm
 
 
-class ResponseMixin(generic.TemplateView):
+class ResponseMixin:
     @staticmethod
     def response(url, headers=HEADERS, params=PARAMS):
         return requests.get(
@@ -32,7 +33,18 @@ class ResponseMixin(generic.TemplateView):
         )
 
 
-class OrderList(ResponseMixin):
+class ListCreatePositionsDocMixin:
+    def get_positions(self):
+        pk = self.kwargs['slug']
+        url = (f'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder/{pk}')
+        self.number = self.response(url).json()
+        url += '/positions?expand=assortment'
+        response = self.response(url, params=None).json()['rows']
+        self.positions_quantity = len(response)
+        self.positions = response
+
+
+class OrderList(ResponseMixin, generic.TemplateView):
     template_name = 'purchaseorder/main.html'
 
     def get_context_data(self, **kwargs):
@@ -48,7 +60,11 @@ class OrderList(ResponseMixin):
         self.order_list = response.json()['rows']
 
 
-class OrderPositions(ResponseMixin):
+class OrderPositions(
+    ResponseMixin,
+    ListCreatePositionsDocMixin,
+    generic.TemplateView
+):
     template_name = 'purchaseorder/order.html'
 
     def get_context_data(self, **kwargs):
@@ -56,13 +72,18 @@ class OrderPositions(ResponseMixin):
         self.get_positions()
         context["context"] = self.positions
         context['number'] = self.number
+        context['positions_quantity'] = self.positions_quantity
         return context
 
-    def get_positions(self):
-        pk = self.kwargs['slug']
-        url = (f'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder/{pk}')
-        self.number = self.response(url).json()
-        url += '/positions?expand=assortment'
-        response = self.response(url, params=None).json()['rows']
-        print(len(response))
-        self.positions = response
+
+class CreateOrderDoc(
+    ResponseMixin,
+    ListCreatePositionsDocMixin,
+    View
+):
+    template_name = 'purchaseorder/create_doc.html'
+
+    def post(self, request, *args, **kwargs):
+        self.get_positions()
+        context = {'context': self.positions}
+        return render(request, self.template_name, context)

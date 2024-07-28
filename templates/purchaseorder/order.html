@@ -3,13 +3,21 @@
   Сканер
 {% endblock %}
 {% block content %}
-  {% comment %} <h1>Позиции в заказе. {{number}} </h1> {% endcomment %}
+  <h1>Заказ. {{number.name}} </h1>
+  <h3>Позиций в заказе: {{ positions_quantity }} </h3>
+  <br>
+  <form method="POST" action="{% url 'purchaseorder:create_doc' number.id %}">
+    {% csrf_token %}
+    <input type="hidden" id="api_data" name="api_data">
+    <button type="submit">Создать запись</button>
+</form>
+  <br>
   <table class="table table-striped">
     <thead>
       <tr>
         <th scope="col">Название</th>
         <th scope="col">Код</th>
-        <th scope="col">Баркоды</th>
+        <th scope="col">Баркод</th>
         <th scope="col">Заказано шт</th>
         <th scope="col">Сумма Руб</th>
       </tr>
@@ -20,8 +28,8 @@
         <td>{{ i.assortment.name }}</td>
         <td>{{ i.assortment.code }}</td>
         <td>{{ i.assortment.barcodes }}</td>
-        <td>{{ i.quantity }}</td>
-        <td>{{ i.price|floatformat:2 }}</td>
+        <td>{{ i.quantity|floatformat:0 }}</td>
+        <td>{{ i.price }}</td>
       </tr>
       {% endfor %}
     </tbody>
