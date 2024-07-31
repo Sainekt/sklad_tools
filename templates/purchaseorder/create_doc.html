@@ -3,5 +3,36 @@
   Сканер
 {% endblock %}
 {% block content %}
-  <h1>Заказ. {{context}} </h1>
+  <h1>Документ заказа: {{number}} </h1>
+  <h3>Позиций в заказе: {{ object_list.count }} </h3>
+  <br>
+</form>
+  <br>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Название</th>
+        <th scope="col">Код</th>
+        <th scope="col">Баркод</th>
+        <th scope="col">Заказано шт</th>
+        <th scope="col">Сумма</th>
+        <th scope="col">Факт</th>
+        <th scope="col">Комментарий</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in object_list %}
+      <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.code }}</td>
+        <td>{{ product.barcodes }}</td>
+        <td>{{ product.quantity|floatformat:0 }}</td>
+        <td>{{ product.summ }}</td>
+        <td>{{ product.fact }}</td>
+        <td>{{ product.comment }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}

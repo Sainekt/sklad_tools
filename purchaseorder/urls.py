@@ -11,4 +11,5 @@ urlpatterns = [
         views.CreateOrderDoc.as_view(),
         name='create_doc',
     ),
+    path('document/<slug:slug>/', views.OrderDoc.as_view(), name='document')
 ]

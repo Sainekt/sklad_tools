@@ -10,7 +10,7 @@ brands = {
     'krups', 'whirlpool', 'lg', 'dolce gusto', 'saeco', 'braun', 'nivona',
     'indesit', 'samsung', 'ariston', 'rowenta', 'philips-saeco', 'maytag',
     'jura', 'delonghi', 'spidem', 'gaggia', 'smeg', 'kitchenaid', 'delfa',
-    'hansa', 'zelmer', 'bifinett', 'nespresso', 'franke'
+    'hansa', 'zelmer', 'bifinett', 'nespresso', 'franke', 'candy'
 }
 
 file_path = os.path.join(settings.BASE_DIR, 'utils', 'ozon', 'mem.txt')
