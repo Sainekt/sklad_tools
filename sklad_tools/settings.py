@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'pages.apps.PagesConfig',
     'ozon.apps.OzonConfig',
     'purchaseorder.apps.PurchaseorderConfig',
-    'scanner.apps.ScannerConfig',
     'django_bootstrap5',
 ]
 

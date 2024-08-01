@@ -2,18 +2,17 @@
 {% load django_bootstrap5 %}
 
 {% block title %}
-  Работа с шаблонами OZON
+  Редактирование Факта
 {% endblock %}
 
 {% block content %}
-<a class="btn btn text-muted" href="{% url 'ozon:list' %}">Список обработанных шаблонов</a>
 <br><br>
 
 <div class="row justify-content-center"> 
   <div class="col-md-8">
     <div class="card text-white bg-dark mb-3 text-center">
       <div class="card-header">
-        Шаблон OZON
+        Редактирование
       </div>
       <div class="card-body">
         <form method='post' enctype="multipart/form-data" id='form1'>
