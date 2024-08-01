@@ -3,6 +3,7 @@ from django.db import models
 
 class Order(models.Model):
     name = models.CharField(max_length=100, verbose_name='Номер заказа')
+    slug = models.SlugField(max_length=100, verbose_name='Слагифицирован')
     created_at = models.DateField('Дата создания', auto_now_add=True)
 
 
@@ -18,5 +19,6 @@ class PurchaseOrder(models.Model):
     quantity = models.IntegerField('Заказано шт')
     summ = models.FloatField('Сумма')
     fact = models.IntegerField('Фактическое количество', null=True, blank=True)
+    plus = models.IntegerField('Посчитано', null=True, blank=True)
     comment = models.CharField(
         'Комментарий', max_length=250, null=True, blank=True)

@@ -1,14 +1,16 @@
 import os
 from dotenv import load_dotenv
 import requests
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
+from django.urls import reverse_lazy
 
 from django.views import generic, View
 from django.db import transaction
+from django.forms import modelformset_factory
 from pytils.translit import slugify
 
 from .models import PurchaseOrder, Order
-# from .forms import ScannerForm, MarketForm
+from .forms import ProductForm, FactForm
 
 load_dotenv()
 
@@ -90,11 +92,12 @@ class CreateOrderDoc(
         order_name = slugify(self.number['name'])
 
         try:
-            Order.objects.get(name=order_name)
+            Order.objects.get(slug=order_name)
             return redirect('purchaseorder:document', order_name)
 
         except Order.DoesNotExist:
-            order = Order.objects.create(name=order_name)
+            order = Order.objects.create(
+                name=self.number['name'], slug=order_name)
 
         for info in self.positions:
             barcodes = str(info['assortment'].get('barcodes'))
@@ -114,16 +117,88 @@ class CreateOrderDoc(
         return redirect('purchaseorder:document', order_name)
 
 
-class OrderDoc(generic.ListView):
+class OrderDoc(View):
+    """Работа с документом."""
     template_name = 'purchaseorder/create_doc.html'
+
+    def get(self, request, slug):
+        order = get_object_or_404(Order, slug=slug)
+        products = order.products.all()
+
+        ProductFormSet = modelformset_factory(
+            PurchaseOrder, form=ProductForm, extra=0
+        )
+        formset = ProductFormSet(queryset=products, prefix='')
+        context = {
+            'number': order.name,
+            'product_formset': formset,
+            'len_doc': len(products),
+            'order_slug': order.slug
+
+        }
+        return render(request, self.template_name, context=context)
+
+    def post(self, request, slug):
+        order = get_object_or_404(Order, slug=slug)
+        products = order.products.all()
+
+        ProductFormset = modelformset_factory(
+            PurchaseOrder, form=ProductForm, extra=0
+        )
+        request_post = request.POST
+        data = {}
+        for i in request_post:
+            if i == 'csrfmiddlewaretoken':
+                continue
+            if request_post[i]:
+                data[i] = request_post[i]
+
+        self.update_order_doc(data, products)
+        formset = ProductFormset(queryset=products)
+        context = {
+            'number': order.name,
+            'product_formset': formset,
+            'len_doc': len(products),
+            'order_slug': order.slug
+        }
+        return render(request, self.template_name, context=context)
+
+    def update_order_doc(self, data, products):
+        fact_updates = []
+        comment_updates = []
+
+        for info in data:
+            index = int(info.split('-')[1])
+            product = products[index]
+            if 'plus' in info:
+                product.fact += int(data[info])
+                fact_updates.append(product)
+            if 'comment' in info:
+                product.comment = data[info]
+                comment_updates.append(product)
+
+        if fact_updates:
+            PurchaseOrder.objects.bulk_update(fact_updates, ['fact'])
+
+        if comment_updates:
+            PurchaseOrder.objects.bulk_update(comment_updates, ['comment'])
+
+
+class DocListViews(generic.ListView):
     model = Order
+    ordering = '-id'
+    paginate_by = 10
 
-    def get_queryset(self):
-        return get_object_or_404(
-            self.model, name=self.kwargs['slug']
-        ).products.all()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['number'] = self.kwargs['slug']
-        return context
+class DocDeleteView(generic.DeleteView):
+    model = Order
+    success_url = reverse_lazy('purchaseorder:doc_list')
+
+
+class DocUpdateView(generic.UpdateView):
+    model = PurchaseOrder
+    form_class = FactForm
+
+    def get_success_url(self):
+        slug = self.kwargs['slug']
+        return reverse_lazy('purchaseorder:document', kwargs={'slug': slug})

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block title %}
-  Сканер
+  Список заказов из моего склада
 {% endblock %}
 {% block content %}
   <h1>Делай свои грязные дела и проваливай.</h1>
-  <table class="table table-striped">
+  <a class="btn btn-secondary btn-sm" href="{% url 'purchaseorder:doc_list' %}">Список созданых документов</a>
+    <table class="table table-striped">
     <thead>
       <tr>
         <th scope="col">Название</th>
