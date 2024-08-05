@@ -61,7 +61,7 @@ class XlFormUpdateView(UpdateView):
 class XlFormListView(ListView):
     model = Ozon
     ordering = '-id'
-    paginate_by = 5
+    paginate_by = 20
 
 
 class Formatter(View):

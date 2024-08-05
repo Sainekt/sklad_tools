@@ -24,8 +24,8 @@
         <form method="post">
             {% csrf_token %}
             <p>Вы уверены, что хотите удалить документ приемки"{{ object.name }}"?</p>
-        <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:doc_list' %}">Назад</a>
             <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+            <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:doc_list' %}">Назад</a>
            </form>
            
         </div>

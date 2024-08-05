@@ -9,7 +9,7 @@
   <form method="POST" action="{% url 'purchaseorder:create_doc' number.id %}">
     {% csrf_token %}
     <input type="hidden" id="api_data" name="api_data">
-    <button type="submit" class="btn btn-primary">Создать запись</button>
+    <button type="submit" class="btn btn-primary">Создать документ</button>
 </form>
   <br>
   <table class="table table-sm table-striped">

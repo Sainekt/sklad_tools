@@ -18,7 +18,7 @@ class PurchaseOrder(models.Model):
         'Баркоды', null=True, blank=True, max_length=250)
     quantity = models.IntegerField('Заказано шт')
     summ = models.FloatField('Сумма')
-    fact = models.IntegerField('Фактическое количество', null=True, blank=True)
+    fact = models.IntegerField('Фактическое количество', default=0)
     plus = models.IntegerField('Посчитано', null=True, blank=True)
     comment = models.CharField(
         'Комментарий', max_length=250, null=True, blank=True)

@@ -122,29 +122,13 @@ class OrderDoc(View):
     template_name = 'purchaseorder/create_doc.html'
 
     def get(self, request, slug):
-        order = get_object_or_404(Order, slug=slug)
-        products = order.products.all()
-
-        ProductFormSet = modelformset_factory(
-            PurchaseOrder, form=ProductForm, extra=0
-        )
-        formset = ProductFormSet(queryset=products, prefix='')
-        context = {
-            'number': order.name,
-            'product_formset': formset,
-            'len_doc': len(products),
-            'order_slug': order.slug
-
-        }
+        order, products, ProductFormset = self.get_data(slug)
+        formset = ProductFormset(queryset=products)
+        context = self.get_context(formset, order, products)
         return render(request, self.template_name, context=context)
 
     def post(self, request, slug):
-        order = get_object_or_404(Order, slug=slug)
-        products = order.products.all()
-
-        ProductFormset = modelformset_factory(
-            PurchaseOrder, form=ProductForm, extra=0
-        )
+        order, products, ProductFormset = self.get_data(slug)
         request_post = request.POST
         data = {}
         for i in request_post:
@@ -152,16 +136,31 @@ class OrderDoc(View):
                 continue
             if request_post[i]:
                 data[i] = request_post[i]
-
-        self.update_order_doc(data, products)
+        if data:
+            self.update_order_doc(data, products)
         formset = ProductFormset(queryset=products)
+        context = self.get_context(formset, order, products)
+        return render(request, self.template_name, context=context)
+
+    @staticmethod
+    def get_data(slug):
+        order = get_object_or_404(Order, slug=slug)
+        products = order.products.all()
+
+        ProductFormset = modelformset_factory(
+            PurchaseOrder, form=ProductForm, extra=0
+        )
+        return order, products, ProductFormset
+
+    @staticmethod
+    def get_context(formset, order, products):
         context = {
             'number': order.name,
             'product_formset': formset,
             'len_doc': len(products),
             'order_slug': order.slug
         }
-        return render(request, self.template_name, context=context)
+        return context
 
     def update_order_doc(self, data, products):
         fact_updates = []
@@ -174,8 +173,9 @@ class OrderDoc(View):
                 product.fact += int(data[info])
                 fact_updates.append(product)
             if 'comment' in info:
-                product.comment = data[info]
-                comment_updates.append(product)
+                if data[info] != product.comment:
+                    product.comment = data[info]
+                    comment_updates.append(product)
 
         if fact_updates:
             PurchaseOrder.objects.bulk_update(fact_updates, ['fact'])

@@ -1,32 +1,29 @@
-{% extends "base.html" %} 
-{% block title %} 
-        Список созданных документов  
-{% endblock %} 
+{% extends "base.html" %}
+{% block title %}
+        Список созданных документов
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">  <!--  Создаем строку, выравниваем ее по центру -->
-  <div class="col-md-10">  <!--  Карточка в 6 колонках -->
+<div class="row justify-content-center">
+  <div class="col-md-10">
     <div class="card mb-3 card text-white bg-dark mb-3">
       <div class="card-header text-white bg-dark mb-3 text-center">
         Список созданных документов
       </div>
 
-      {% if page_obj %}  <!--  Проверяем, есть ли элементы в page_obj -->
+      {% if page_obj %}
         {% for order in page_obj %}
-        <div class="card-body ">
-          <div class="card-header mb-3">
-            Заказ: {{order.name}}
+        <div class="card mb-3 text-white bg-dark">  <!--  Новая карточка для каждого заказа -->
+          <div class="card-header">
+            <h5 class="card-title">Заказ: {{order.name}}</h5>  <!--  Заголовок карточки -->
           </div>
-          <div class="card-header mb-3">
-            Slug: {{order.slug}}
+          <div class="card-body">
+            <p class="card-text">Slug: {{order.slug}}</p>
+            <p class="card-text">Создано: {{order.created_at}}</p>
+            <a class="btn btn-light btn-sm" href="{% url 'purchaseorder:document' order.slug %}">Открыть</a>
+            <a class="btn btn-danger btn-sm" href="{% url 'purchaseorder:doc_delete' order.id %}">Удалить документ</a>
           </div>
-          <div class="card-header mb-3">
-            Создано: {{order.created_at}}
-          </div>
-        <a class="btn btn-light btn-sm" href="{% url 'purchaseorder:document' order.slug %}">Открыть</a>
-        <a class="btn btn-danger btn-sm" href="{% url 'purchaseorder:doc_delete' order.id %}">Удалить документ</a>
-          <hr>
         </div>
-        {% endfor %} 
+        {% endfor %}
       {% else %}
         <div class="card-body text-center">
           <p>Нет заказов</p>

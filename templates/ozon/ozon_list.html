@@ -3,28 +3,31 @@
 Лента  
 {% endblock %} 
 {% block content %}
-<div class="card mb-3 col-6 card text-white bg-dark mb-3">
-    <div class="card-header text-white bg-dark mb-3 text-center">
-      История шаблонов
+<div class="row justify-content-center">
+  <div class="col-md-10">
+    <div class="card mb-3 card text-white bg-dark mb-3">
+      <div class="card-header text-white bg-dark mb-3 text-center">
+        История шаблонов
+      </div>
+
+      {% for post in page_obj %}
+      <div class="card text-white bg-dark mb-3" style="margin-bottom: 10px;">  
+        <div class="card-header">
+          <h5 class="card-title">Наименование: {{post.title}}</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Штрих-код: {{post.barcode}}</p> 
+          <p>
+            <a class="btn btn-light btn-sm" href="{% url 'ozon:edit' post.id %}">Редактировать</a>
+            <a class="btn btn-light btn-sm" href="{% url 'ozon:detail' post.id %}">Детали</a>
+          </p>
+        </div>
+      </div>
+      {% endfor %} 
+
     </div>
-
-{% for post in page_obj %}
-<div class="card-body ">
-    <div class="card-header mb-3">
-        Наименование: {{post.title}}
-      </div>
-      <div class="card-header mb-3">
-        Штрих-код {{post.barcode}}
-      </div>
-    
-    <p>
-    <a class="btn btn-light btn-sm" href="{% url 'ozon:edit' post.id %}">Редактировать</a>
-    <a class="btn btn-light btn-sm" href="{% url 'ozon:detail' post.id %}">Детали</a>
-    </p>
-    <hr>
+  </div>
 </div>
-{% endfor %} 
 
-</div>
 {%include "includes/paginator.html" %}
 {% endblock %}
