@@ -9,7 +9,7 @@ from django.db import transaction
 from django.forms import modelformset_factory
 from pytils.translit import slugify
 
-from .models import PurchaseOrder, Order
+from .models import PurchaseOrder, Order, Product
 from .forms import ProductForm, FactForm
 
 load_dotenv()
@@ -89,6 +89,7 @@ class CreateOrderDoc(
     def post(self, request, *args, **kwargs):
         self.get_positions()
         object_to_create = []
+        product_to_creqte = []
         order_name = slugify(self.number['name'])
 
         try:
@@ -99,17 +100,33 @@ class CreateOrderDoc(
             order = Order.objects.create(
                 name=self.number['name'], slug=order_name)
 
+        # for info in self.positions:
+        #     barcodes = str(info['assortment'].get('barcodes'))
+        #     new_obj = PurchaseOrder(
+        #         name=info['assortment']['name'],
+        #         order=order,
+        #         code=info['assortment']['code'],
+        #         barcodes=barcodes,
+        #         quantity=info['quantity'],
+        #         summ=info['price'],
+        #         fact=0,
+        #     )
         for info in self.positions:
             barcodes = str(info['assortment'].get('barcodes'))
             new_obj = PurchaseOrder(
-                name=info['assortment']['name'],
                 order=order,
-                code=info['assortment']['code'],
-                barcodes=barcodes,
                 quantity=info['quantity'],
                 summ=info['price'],
                 fact=0,
+                product=Product.objects.get_or_create(
+                    product_id=info['assortment']['id'],
+                    name=info['assortment']['name'],
+                    barcodes=barcodes,
+                    code=info['assortment']['code'],
+                    article=info['assortment']['article'],
+                )
             )
+
             object_to_create.append(new_obj)
         with transaction.atomic():
             PurchaseOrder.objects.bulk_create(object_to_create)
