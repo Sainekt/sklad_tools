@@ -89,7 +89,6 @@ class CreateOrderDoc(
     def post(self, request, *args, **kwargs):
         self.get_positions()
         object_to_create = []
-        product_to_creqte = []
         order_name = slugify(self.number['name'])
 
         try:
@@ -100,31 +99,26 @@ class CreateOrderDoc(
             order = Order.objects.create(
                 name=self.number['name'], slug=order_name)
 
-        # for info in self.positions:
-        #     barcodes = str(info['assortment'].get('barcodes'))
-        #     new_obj = PurchaseOrder(
-        #         name=info['assortment']['name'],
-        #         order=order,
-        #         code=info['assortment']['code'],
-        #         barcodes=barcodes,
-        #         quantity=info['quantity'],
-        #         summ=info['price'],
-        #         fact=0,
-        #     )
         for info in self.positions:
             barcodes = str(info['assortment'].get('barcodes'))
+            try:
+                product = Product.objects.get(
+                    product_id=info['assortment']['id']
+                )
+            except Product.DoesNotExist:
+                product = Product.objects.create(
+                        product_id=info['assortment']['id'],
+                        name=info['assortment']['name'],
+                        barcodes=barcodes,
+                        code=info['assortment']['code'],
+                        article=info['assortment']['article'],
+                )
             new_obj = PurchaseOrder(
                 order=order,
                 quantity=info['quantity'],
                 summ=info['price'],
                 fact=0,
-                product=Product.objects.get_or_create(
-                    product_id=info['assortment']['id'],
-                    name=info['assortment']['name'],
-                    barcodes=barcodes,
-                    code=info['assortment']['code'],
-                    article=info['assortment']['article'],
-                )
+                product=product
             )
 
             object_to_create.append(new_obj)
@@ -139,13 +133,13 @@ class OrderDoc(View):
     template_name = 'purchaseorder/create_doc.html'
 
     def get(self, request, slug):
-        order, products, ProductFormset = self.get_data(slug)
-        formset = ProductFormset(queryset=products)
-        context = self.get_context(formset, order, products)
+        order, order_positions, ProductFormset = self.get_data(slug)
+        formset = ProductFormset(queryset=order_positions)
+        context = self.get_context(formset, order, order_positions)
         return render(request, self.template_name, context=context)
 
     def post(self, request, slug):
-        order, products, ProductFormset = self.get_data(slug)
+        order, order_positions, ProductFormset = self.get_data(slug)
         request_post = request.POST
         data = {}
         for i in request_post:
@@ -154,28 +148,28 @@ class OrderDoc(View):
             if request_post[i]:
                 data[i] = request_post[i]
         if data:
-            self.update_order_doc(data, products)
-        formset = ProductFormset(queryset=products)
-        context = self.get_context(formset, order, products)
+            self.update_order_doc(data, order_positions)
+        formset = ProductFormset(queryset=order_positions)
+        context = self.get_context(formset, order, order_positions)
         return render(request, self.template_name, context=context)
 
     @staticmethod
     def get_data(slug):
         order = get_object_or_404(Order, slug=slug)
-        products = order.products.all()
+        order_positions = order.products.select_related('order', 'product')
 
         ProductFormset = modelformset_factory(
             PurchaseOrder, form=ProductForm, extra=0
         )
-        return order, products, ProductFormset
+        return order, order_positions, ProductFormset
 
     @staticmethod
-    def get_context(formset, order, products):
+    def get_context(formset, order, order_positions):
         context = {
             'number': order.name,
             'product_formset': formset,
-            'len_doc': len(products),
-            'order_slug': order.slug
+            'len_doc': len(formset),
+            'order_slug': order.slug,
         }
         return context
 

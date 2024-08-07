@@ -25,9 +25,9 @@
         {% for form in product_formset %}
         <tr>
           <td>{{ forloop.counter }}</td>
-          <td>{{ form.instance.name }}</td>
-          <td>{{ form.instance.code }}</td>
-          <td>{{ form.instance.barcodes }}</td>
+          <td>{{ form.instance.product.name }}</td>
+          <td>{{ form.instance.product.code }}</td>
+          <td>{{ form.instance.product.barcodes }}</td>
           <td>{{ form.instance.quantity|floatformat:0 }}</td>
           {{ form.management_form }}
           <td>{{ form.instance.fact }}</td>
