@@ -133,38 +133,36 @@ class OrderDoc(View):
     template_name = 'purchaseorder/create_doc.html'
 
     def get(self, request, slug):
-        order, order_positions, ProductFormset = self.get_data(slug)
-        formset = ProductFormset(queryset=order_positions)
-        context = self.get_context(formset, order, order_positions)
+        order, formset = self.get_data(slug, request)
+        context = self.get_context(formset, order)
         return render(request, self.template_name, context=context)
 
     def post(self, request, slug):
-        order, order_positions, ProductFormset = self.get_data(slug)
-        request_post = request.POST
-        data = {}
-        for i in request_post:
-            if i == 'csrfmiddlewaretoken':
-                continue
-            if request_post[i]:
-                data[i] = request_post[i]
-        if data:
-            self.update_order_doc(data, order_positions)
-        formset = ProductFormset(queryset=order_positions)
-        context = self.get_context(formset, order, order_positions)
+        order, formset = self.get_data(slug, request)
+        context = self.get_context(formset, order)
         return render(request, self.template_name, context=context)
 
-    @staticmethod
-    def get_data(slug):
+    def get_data(self, slug, request):
         order = get_object_or_404(Order, slug=slug)
         order_positions = order.products.select_related('order', 'product')
 
         ProductFormset = modelformset_factory(
             PurchaseOrder, form=ProductForm, extra=0
         )
-        return order, order_positions, ProductFormset
+        if request_post := request.POST:
+            data = {}
+            for i in request_post:
+                if i == 'csrfmiddlewaretoken':
+                    continue
+                if request_post[i]:
+                    data[i] = request_post[i]
+            if data:
+                self.update_order_doc(data, order_positions)
+        formset = ProductFormset(queryset=order_positions)
+        return order, formset
 
     @staticmethod
-    def get_context(formset, order, order_positions):
+    def get_context(formset, order):
         context = {
             'number': order.name,
             'product_formset': formset,
@@ -173,13 +171,13 @@ class OrderDoc(View):
         }
         return context
 
-    def update_order_doc(self, data, products):
+    def update_order_doc(self, data: dict, order_positions):
         fact_updates = []
         comment_updates = []
 
         for info in data:
             index = int(info.split('-')[1])
-            product = products[index]
+            product = order_positions[index]
             if 'plus' in info:
                 product.fact += int(data[info])
                 fact_updates.append(product)
