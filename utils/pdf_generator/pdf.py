@@ -1,11 +1,12 @@
-from datetime import datetime
-
 from reportlab.pdfgen import canvas
 from reportlab_qr_code import qr_draw
 from reportlab.graphics.barcode import code128
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+
+pdfmetrics.registerFont(TTFont('Noto', 'NOTOSANS-REGULAR.ttf'))
+pdfmetrics.registerFont(TTFont('Noto-bold', 'NOTOSANS-BOLD.ttf'))
 
 
 def draw_name_and_code(product, pdf):
@@ -36,10 +37,11 @@ def draw_name_and_code(product, pdf):
     pdf.drawString(x, 22*mm, product.code)
 
 
-def draw_date_and_cell(product, pdf):
+def draw_date_and_cell(product, pdf, date):
     pdf.setFont('Noto', 8)
     x, y = 2, 10
-    pdf.drawString(x, y, str(datetime.today().date()))
+    formatted_date = date.strftime("%d-%m")
+    pdf.drawString(x, y, str(formatted_date))
     pdf.setFont('Noto-bold', 10)
     x, y = 25, 10
     if product.cell_number:
@@ -55,8 +57,6 @@ def clear_barcodes(product):
 
 
 def create_label(data):
-    pdfmetrics.registerFont(TTFont('Noto', 'NOTOSANS-REGULAR.ttf'))
-    pdfmetrics.registerFont(TTFont('Noto-bold', 'NOTOSANS-BOLD.ttf'))
     pdf = canvas.Canvas(
         filename='media/pdf/products_label.pdf', pagesize=(57*mm, 40*mm)
     )
@@ -71,6 +71,6 @@ def create_label(data):
             )
             barcode_draw.drawOn(pdf, x=-2*mm, y=14*mm)
             draw_name_and_code(product, pdf)
-            draw_date_and_cell(product, pdf)
+            draw_date_and_cell(product, pdf, products.order.created_at)
             pdf.showPage()
     pdf.save()
