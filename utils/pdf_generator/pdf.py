@@ -47,9 +47,10 @@ def draw_date_and_cell(product, pdf, date):
 
 
 def clear_barcodes(product):
-    if not product.barcodes:
-        return 'There are no codes :('
-    barcods = product.barcodes.split(':')[1]
+    barcode = product.barcodes
+    if barcode == 'None':
+        return
+    barcods = barcode.split(':')[1]
     barcod = barcods.split("'")[1]
     return barcod
 
@@ -63,11 +64,13 @@ def create_label(data):
         product = products.product
         barcode = clear_barcodes(product)
         for _ in range(iterations):
-            qr_draw(pdf, text=barcode, x='45mm', y='1mm', size='1cm')
-            barcode_draw = code128.Code128(
-                barcode, humanReadable=True, barHeight=5*mm, barWidth=0.3*mm
-            )
-            barcode_draw.drawOn(pdf, x=-2*mm, y=14*mm)
+            if barcode:
+                qr_draw(pdf, text=barcode, x='45mm', y='1mm', size='1cm')
+                barcode_draw = code128.Code128(
+                    barcode, humanReadable=True,
+                    barHeight=5*mm, barWidth=0.3*mm
+                )
+                barcode_draw.drawOn(pdf, x=-2*mm, y=14*mm)
             draw_name_and_code(product, pdf)
             draw_date_and_cell(product, pdf, products.order.created_at)
             pdf.showPage()

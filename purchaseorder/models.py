@@ -4,6 +4,7 @@ from django.db import models
 class Order(models.Model):
     name = models.CharField(max_length=100, verbose_name='Номер заказа')
     slug = models.SlugField(max_length=100, verbose_name='Слагифицирован')
+    order_id = models.CharField(max_length=100, verbose_name='Api ID заказа')
     created_at = models.DateField('Дата создания', auto_now_add=True)
 
 

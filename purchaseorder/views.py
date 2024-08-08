@@ -2,7 +2,9 @@ import os
 from dotenv import load_dotenv
 import requests
 from django.shortcuts import redirect, get_object_or_404, render
+from django.conf import settings
 from django.urls import reverse_lazy
+from django.http import HttpResponse
 
 from django.views import generic, View
 from django.db import transaction
@@ -38,6 +40,8 @@ class ResponseMixin:
 
 
 class ListCreatePositionsDocMixin:
+    cell_id = '17bbadc0-786b-11ec-0a80-06bd004b0ee2'
+
     def get_positions(self):
         pk = self.kwargs['slug']
         url = (
@@ -48,6 +52,16 @@ class ListCreatePositionsDocMixin:
         response = self.response(url, params=None).json()['rows']
         self.positions_quantity = len(response)
         self.positions = response
+
+    def get_cell(self, info):
+        cell_attr = info['assortment'].get('attributes')
+        cell_value = ''
+        if cell_attr:
+            for cell in cell_attr:
+                if cell['id'] == self.cell_id:
+                    cell_value = cell['value']
+
+        return cell_value
 
 
 class OrderList(ResponseMixin, generic.TemplateView):
@@ -98,7 +112,8 @@ class CreateOrderDoc(
 
         except Order.DoesNotExist:
             order = Order.objects.create(
-                name=self.number['name'], slug=order_name)
+                name=self.number['name'], slug=order_name,
+                order_id=self.number['id'])
 
         for info in self.positions:
             barcodes = str(info['assortment'].get('barcodes'))
@@ -107,12 +122,14 @@ class CreateOrderDoc(
                     product_id=info['assortment']['id']
                 )
             except Product.DoesNotExist:
+                cell_value = self.get_cell(info)
                 product = Product.objects.create(
                         product_id=info['assortment']['id'],
                         name=info['assortment']['name'],
                         barcodes=barcodes,
                         code=info['assortment']['code'],
                         article=info['assortment']['article'],
+                        cell_number=cell_value
                 )
             new_obj = PurchaseOrder(
                 order=order,
@@ -165,10 +182,9 @@ class OrderDoc(View):
     @staticmethod
     def get_context(formset, order):
         context = {
-            'number': order.name,
+            'order': order,
             'product_formset': formset,
             'len_doc': len(formset),
-            'order_slug': order.slug,
         }
         return context
 
@@ -216,3 +232,65 @@ class DocUpdateView(generic.UpdateView):
     def get_success_url(self):
         slug = self.kwargs['slug']
         return reverse_lazy('purchaseorder:document', kwargs={'slug': slug})
+
+
+class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
+    def post(self, request, *args, **kwargs):
+        self.get_positions()
+        order_name = slugify(self.number['name'])
+        order = get_object_or_404(Order, slug=order_name)
+
+        with transaction.atomic():
+            for info in self.positions:
+                barcodes = str(info['assortment'].get('barcodes'))
+                try:
+                    product = Product.objects.get(
+                        product_id=info['assortment']['id']
+                    )
+                except Product.DoesNotExist:
+                    product = Product.objects.create(
+                        product_id=info['assortment']['id'],
+                        name=info['assortment']['name'],
+                        barcodes=barcodes,
+                        code=info['assortment']['code'],
+                        article=info['assortment']['article'],
+                    )
+                else:
+                    cell_value = self.get_cell(info)
+                    product.name = info['assortment']['name']
+                    product.barcodes = barcodes
+                    product.code = info['assortment']['code']
+                    product.article = info['assortment']['article']
+                    product.cell_number = cell_value
+                    product.save()
+
+                # Обновление или создание записи в PurchaseOrder
+                try:
+                    purchase_order = PurchaseOrder.objects.get(
+                        order=order,
+                        product=product
+                    )
+                except PurchaseOrder.DoesNotExist:
+                    purchase_order = PurchaseOrder(
+                        order=order,
+                        product=product
+                    )
+                purchase_order.quantity = info['quantity']
+                purchase_order.summ = info['price']
+                purchase_order.save()
+
+        return redirect('purchaseorder:document', order_name)
+
+
+def download_label(request):
+    file_path = os.path.join(
+        settings.BASE_DIR, 'media', 'pdf', 'products_label.pdf'
+    )
+    with open(file_path, 'rb') as file:
+        response = HttpResponse(
+            file.read(), content_type="application/pdf"
+        )
+        response['Content-Disposition'] = (
+            'attachment; filename="products_label.pdf"'
+        )
+        return response
