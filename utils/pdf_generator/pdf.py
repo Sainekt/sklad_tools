@@ -39,13 +39,11 @@ def draw_name_and_code(product, pdf):
 
 def draw_date_and_cell(product, pdf, date):
     pdf.setFont('Noto', 8)
-    x, y = 2, 10
     formatted_date = date.strftime("%d-%m")
-    pdf.drawString(x, y, str(formatted_date))
+    pdf.drawString(2, 10, str(formatted_date))
     pdf.setFont('Noto-bold', 10)
-    x, y = 25, 10
     if product.cell_number:
-        pdf.drawString(x, y, product.cell_number[:18])
+        pdf.drawRightString(44*mm, 10, product.cell_number[:18])
 
 
 def clear_barcodes(product):

@@ -198,7 +198,6 @@ class OrderDoc(View):
             PurchaseOrder.objects.bulk_update(comment_updates, ['comment'])
 
 
-
 class DocListViews(generic.ListView):
     model = Order
     ordering = '-id'
