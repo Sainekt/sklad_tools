@@ -11,6 +11,7 @@ from pytils.translit import slugify
 
 from .models import PurchaseOrder, Order, Product
 from .forms import ProductForm, FactForm
+from utils.pdf_generator.pdf import create_label
 
 load_dotenv()
 
@@ -174,13 +175,16 @@ class OrderDoc(View):
     def update_order_doc(self, data: dict, order_positions):
         fact_updates = []
         comment_updates = []
+        labels = []
 
         for info in data:
             index = int(info.split('-')[1])
             product = order_positions[index]
             if 'plus' in info:
-                product.fact += int(data[info])
+                plus = int(data[info])
+                product.fact += plus
                 fact_updates.append(product)
+                labels.append((product, plus))
             if 'comment' in info:
                 if data[info] != product.comment:
                     product.comment = data[info]
@@ -188,9 +192,11 @@ class OrderDoc(View):
 
         if fact_updates:
             PurchaseOrder.objects.bulk_update(fact_updates, ['fact'])
+            create_label(labels)
 
         if comment_updates:
             PurchaseOrder.objects.bulk_update(comment_updates, ['comment'])
+
 
 
 class DocListViews(generic.ListView):
