@@ -8,6 +8,9 @@ class Order(models.Model):
         max_length=100, verbose_name='Api ID заказа', unique=True
     )
     created_at = models.DateField('Дата создания', auto_now_add=True)
+    xl_doc = models.FileField(
+        'Итоговый документ', blank=True, null=True, upload_to='purchaseorder'
+    )
 
 
 class Product(models.Model):

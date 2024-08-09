@@ -10,7 +10,8 @@
   <h1>Документ заказа: {{order.name}} </h1>
   <h3>Позиций в заказе: {{ len_doc }} </h3>
   <br>
-  <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:download_label' %}"  download>Скачать шаблон</a>
+  <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:download_label' %}"  download>Скачать этикетку</a>
+  <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформировать и скачать файл</a>
   <form method="post">
     {% csrf_token %}
     <table class="table table-sm table-striped">

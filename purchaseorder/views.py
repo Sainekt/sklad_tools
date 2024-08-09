@@ -13,7 +13,8 @@ from pytils.translit import slugify
 
 from .models import PurchaseOrder, Order, Product
 from .forms import ProductForm, FactForm
-from utils.pdf_generator.label_generator import create_label
+from utils.purchaseorder.label_generator import create_label
+from utils.purchaseorder.create_doc import create_report
 
 load_dotenv()
 
@@ -112,15 +113,15 @@ class CreateOrderDoc(
     View
 ):
     def post(self, request, *args, **kwargs):
-        self.get_positions()
-        object_to_create = []
-        order_name = slugify(self.number['name'])
 
         try:
-            Order.objects.get(slug=order_name)
-            return redirect('purchaseorder:document', order_name)
+            order_object = Order.objects.get(order_id=self.kwargs['slug'])
+            return redirect('purchaseorder:document', order_object.slug)
 
         except Order.DoesNotExist:
+            self.get_positions()
+            object_to_create = []
+            order_name = slugify(self.number['name'])
             order = Order.objects.create(
                 name=self.number['name'], slug=order_name,
                 order_id=self.number['id'])
@@ -305,3 +306,14 @@ def download_label(request):
             'attachment; filename="products_label.pdf"'
         )
         return response
+
+
+class CreateDownloadXcelDoc(View):
+    template_name = 'purchaseorder/create_download_xcel.html'
+
+    def get(self, request, *args, **kwargs):
+        order = Order.objects.get(order_id=kwargs['slug'])
+        order_positions = order.products.select_related('order', 'product')
+        create_report(order_positions, order)
+
+        return render(request, self.template_name, context={'a':'a'})
