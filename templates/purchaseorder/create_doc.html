@@ -3,15 +3,17 @@
   Работа с документом {{number}}
 {% endblock %}
 {% block content %}
+<div class="d-flex justify-content-between">
 <form method="POST" action="{% url 'purchaseorder:update_products' order.order_id %}">
   {% csrf_token %}
-  <button type="submit" class="btn btn-light btn-sm">Обновить документ</button>
+  <button type="submit" class="btn btn-primary btn-sm">Обновить документ</button>
 </form>
+  <a class="btn btn-primary btn-sm" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформировать файл</a>
+</div>
   <h1>Документ заказа: {{order.name}} </h1>
   <h3>Позиций в заказе: {{ len_doc }} </h3>
   <br>
   <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:download_label' %}"  download>Скачать этикетку</a>
-  <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформировать и скачать файл</a>
   <form method="post">
     {% csrf_token %}
     <table class="table table-sm table-striped">

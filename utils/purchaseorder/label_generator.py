@@ -5,8 +5,8 @@ from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-pdfmetrics.registerFont(TTFont('Noto', 'NOTOSANS-REGULAR.ttf'))
-pdfmetrics.registerFont(TTFont('Noto-bold', 'NOTOSANS-BOLD.ttf'))
+pdfmetrics.registerFont(TTFont('Noto', 'TIMES.ttf'))
+pdfmetrics.registerFont(TTFont('Noto-bold', 'TIMESBD.ttf'))
 
 
 def draw_name_and_code(product, pdf):
