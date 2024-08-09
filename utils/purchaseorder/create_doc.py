@@ -26,8 +26,9 @@ def create_report(data, order):
 
         index += 1
 
-    file_path = f'media/purchaseorder_doc/Отчет_по_заказу_{order.name}.xlsx'
-
-    work_book.save(file_path)
+    save_path = f'media/purchaseorder_doc/Отчет_по_заказу_{order.name}.xlsx'
+    file_path = f'purchaseorder_doc/Отчет_по_заказу_{order.name}.xlsx'
+    work_book.save(save_path)
+    work_book.close()
     order.xl_doc = file_path
     order.save()
