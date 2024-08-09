@@ -13,7 +13,7 @@ from pytils.translit import slugify
 
 from .models import PurchaseOrder, Order, Product
 from .forms import ProductForm, FactForm
-from utils.pdf_generator.pdf import create_label
+from utils.pdf_generator.label_generator import create_label
 
 load_dotenv()
 
@@ -62,6 +62,16 @@ class ListCreatePositionsDocMixin:
                     cell_value = cell['value']
 
         return cell_value
+
+    def get_valid_data(self, info):
+        if not (product_id := info['assortment'].get('id')):
+            raise ValueError('ID товара не получено от Моего склада.')
+        name = info['assortment'].get('name')
+        barcodes = str(info['assortment'].get('barcodes'))
+        code = info['assortment'].get('code')
+        article = info['assortment'].get('article')
+        cell_number = self.get_cell(info)
+        return product_id, name, barcodes, code, article, cell_number
 
 
 class OrderList(ResponseMixin, generic.TemplateView):
@@ -116,20 +126,20 @@ class CreateOrderDoc(
                 order_id=self.number['id'])
 
         for info in self.positions:
-            barcodes = str(info['assortment'].get('barcodes'))
+            (product_id, name, barcodes,
+             code, article, cell_number) = self.get_valid_data(info)
             try:
                 product = Product.objects.get(
-                    product_id=info['assortment']['id']
+                    product_id=product_id
                 )
             except Product.DoesNotExist:
-                cell_value = self.get_cell(info)
                 product = Product.objects.create(
-                        product_id=info['assortment']['id'],
-                        name=info['assortment']['name'],
+                        product_id=product_id,
+                        name=name,
                         barcodes=barcodes,
-                        code=info['assortment']['code'],
-                        article=info['assortment']['article'],
-                        cell_number=cell_value
+                        code=code,
+                        article=article,
+                        cell_number=cell_number
                 )
             new_obj = PurchaseOrder(
                 order=order,
@@ -242,26 +252,27 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
 
         with transaction.atomic():
             for info in self.positions:
-                barcodes = str(info['assortment'].get('barcodes'))
+                (product_id, name, barcodes,
+                 code, article, cell_number) = self.get_valid_data(info)
                 try:
                     product = Product.objects.get(
-                        product_id=info['assortment']['id']
+                        product_id=product_id
                     )
                 except Product.DoesNotExist:
                     product = Product.objects.create(
-                        product_id=info['assortment']['id'],
-                        name=info['assortment']['name'],
+                        product_id=product_id,
+                        name=name,
                         barcodes=barcodes,
-                        code=info['assortment']['code'],
-                        article=info['assortment']['article'],
+                        code=code,
+                        article=article,
+                        cell_number=cell_number
                     )
                 else:
-                    cell_value = self.get_cell(info)
-                    product.name = info['assortment']['name']
+                    product.name = name
                     product.barcodes = barcodes
-                    product.code = info['assortment']['code']
-                    product.article = info['assortment']['article']
-                    product.cell_number = cell_value
+                    product.code = code
+                    product.article = article
+                    product.cell_number = cell_number
                     product.save()
 
                 # Обновление или создание записи в PurchaseOrder

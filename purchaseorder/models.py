@@ -4,12 +4,16 @@ from django.db import models
 class Order(models.Model):
     name = models.CharField(max_length=100, verbose_name='Номер заказа')
     slug = models.SlugField(max_length=100, verbose_name='Слагифицирован')
-    order_id = models.CharField(max_length=100, verbose_name='Api ID заказа')
+    order_id = models.CharField(
+        max_length=100, verbose_name='Api ID заказа', unique=True
+    )
     created_at = models.DateField('Дата создания', auto_now_add=True)
 
 
 class Product(models.Model):
-    product_id = models.SlugField(max_length=100, verbose_name='ID товара')
+    product_id = models.SlugField(
+        max_length=100, verbose_name='ID товара', unique=True
+    )
     name = models.CharField(max_length=250, verbose_name='Наименование')
     code = models.CharField(
         max_length=100, verbose_name='Код товара', null=True, blank=True

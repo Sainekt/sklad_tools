@@ -26,7 +26,11 @@ def draw_name_and_code(product, pdf):
         if i % 27 == 0:
             pdf.drawString(x, y, result)
             result = ''
-            y -= 11
+            if y < 26.5:
+                y = 26.5
+            else:
+                y -= 3.4*mm
+
         result += product.name[i]
     else:
         x = get_center(product.name, 2)
