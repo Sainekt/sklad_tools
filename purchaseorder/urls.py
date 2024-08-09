@@ -22,5 +22,10 @@ urlpatterns = [
         'product/<int:pk>/update/<slug:slug>/',
         views.DocUpdateView.as_view(),
         name='product_update'
-    )
+    ),
+    path('document/<slug:slug>/products_update',
+         views.DocUpdateProducts.as_view(), name='update_products'),
+    path('download-label/', views.download_label, name='download_label'),
+    path('create_xcel/<slug:slug>/',
+         views.CreateDownloadXcelDoc.as_view(), name='download_doc'),
 ]

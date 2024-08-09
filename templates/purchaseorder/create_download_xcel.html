@@ -1,0 +1,31 @@
+   {% extends "base.html" %} 
+{% block title %} 
+        Скачать результат приемки {{object.name}}
+{% endblock %} 
+{% block content %}
+
+
+<div class="row justify-content-center">  <!--  Создаем строку, выравниваем ее по центру -->
+  <div class="col-md-10">  <!--  Карточка в 6 колонках -->
+    <div class="card mb-3 card text-white bg-dark mb-3">
+      <div class="card-header text-white bg-dark mb-3 text-center">
+        Результат приемки {{object.name}}
+      </div>
+        <div class="card-body ">
+          <div class="card-header mb-3">
+            Документ: {{order.name}}
+          </div>
+          <div class="card-header mb-3">
+            Создано: {{order.created_at}}
+          </div>
+          <div class="card-header mb-3">
+            Товаров в заказе: {{ count_product }}
+          </div>
+          <a class="btn btn-success btn-sm" href="{% url 'pages:home' %}{{order.xl_doc}}"  download>Скачать шаблон</a>
+        </div>
+    </div>
+  </div>
+</div> 
+
+{%include "includes/paginator.html" %}
+{% endblock %}

@@ -1,16 +1,21 @@
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 import requests
 from django.shortcuts import redirect, get_object_or_404, render
+from django.conf import settings
 from django.urls import reverse_lazy
+from django.http import HttpResponse
 
 from django.views import generic, View
 from django.db import transaction
 from django.forms import modelformset_factory
 from pytils.translit import slugify
 
-from .models import PurchaseOrder, Order
+from .models import PurchaseOrder, Order, Product
 from .forms import ProductForm, FactForm
+from utils.purchaseorder.label_generator import create_label
+from utils.purchaseorder.create_doc import create_report
 
 load_dotenv()
 
@@ -37,6 +42,8 @@ class ResponseMixin:
 
 
 class ListCreatePositionsDocMixin:
+    cell_id = '17bbadc0-786b-11ec-0a80-06bd004b0ee2'
+
     def get_positions(self):
         pk = self.kwargs['slug']
         url = (
@@ -47,6 +54,26 @@ class ListCreatePositionsDocMixin:
         response = self.response(url, params=None).json()['rows']
         self.positions_quantity = len(response)
         self.positions = response
+
+    def get_cell(self, info):
+        cell_attr = info['assortment'].get('attributes')
+        cell_value = ''
+        if cell_attr:
+            for cell in cell_attr:
+                if cell['id'] == self.cell_id:
+                    cell_value = cell['value']
+
+        return cell_value
+
+    def get_valid_data(self, info):
+        if not (product_id := info['assortment'].get('id')):
+            raise ValueError('ID товара не получено от Моего склада.')
+        name = info['assortment'].get('name')
+        barcodes = str(info['assortment'].get('barcodes'))
+        code = info['assortment'].get('code')
+        article = info['assortment'].get('article')
+        cell_number = self.get_cell(info)
+        return product_id, name, barcodes, code, article, cell_number
 
 
 class OrderList(ResponseMixin, generic.TemplateView):
@@ -87,29 +114,43 @@ class CreateOrderDoc(
     View
 ):
     def post(self, request, *args, **kwargs):
-        self.get_positions()
-        object_to_create = []
-        order_name = slugify(self.number['name'])
 
         try:
-            Order.objects.get(slug=order_name)
-            return redirect('purchaseorder:document', order_name)
+            order_object = Order.objects.get(order_id=self.kwargs['slug'])
+            return redirect('purchaseorder:document', order_object.slug)
 
         except Order.DoesNotExist:
+            self.get_positions()
+            object_to_create = []
+            order_name = slugify(self.number['name'])
             order = Order.objects.create(
-                name=self.number['name'], slug=order_name)
+                name=self.number['name'], slug=order_name,
+                order_id=self.number['id'])
 
         for info in self.positions:
-            barcodes = str(info['assortment'].get('barcodes'))
+            (product_id, name, barcodes,
+             code, article, cell_number) = self.get_valid_data(info)
+            try:
+                product = Product.objects.get(
+                    product_id=product_id
+                )
+            except Product.DoesNotExist:
+                product = Product.objects.create(
+                        product_id=product_id,
+                        name=name,
+                        barcodes=barcodes,
+                        code=code,
+                        article=article,
+                        cell_number=cell_number
+                )
             new_obj = PurchaseOrder(
-                name=info['assortment']['name'],
                 order=order,
-                code=info['assortment']['code'],
-                barcodes=barcodes,
                 quantity=info['quantity'],
                 summ=info['price'],
                 fact=0,
+                product=product
             )
+
             object_to_create.append(new_obj)
         with transaction.atomic():
             PurchaseOrder.objects.bulk_create(object_to_create)
@@ -122,56 +163,56 @@ class OrderDoc(View):
     template_name = 'purchaseorder/create_doc.html'
 
     def get(self, request, slug):
-        order, products, ProductFormset = self.get_data(slug)
-        formset = ProductFormset(queryset=products)
-        context = self.get_context(formset, order, products)
+        order, formset = self.get_data(slug, request)
+        context = self.get_context(formset, order)
         return render(request, self.template_name, context=context)
 
     def post(self, request, slug):
-        order, products, ProductFormset = self.get_data(slug)
-        request_post = request.POST
-        data = {}
-        for i in request_post:
-            if i == 'csrfmiddlewaretoken':
-                continue
-            if request_post[i]:
-                data[i] = request_post[i]
-        if data:
-            self.update_order_doc(data, products)
-        formset = ProductFormset(queryset=products)
-        context = self.get_context(formset, order, products)
+        order, formset = self.get_data(slug, request)
+        context = self.get_context(formset, order)
         return render(request, self.template_name, context=context)
 
-    @staticmethod
-    def get_data(slug):
+    def get_data(self, slug, request):
         order = get_object_or_404(Order, slug=slug)
-        products = order.products.all()
+        order_positions = order.products.select_related('order', 'product')
 
         ProductFormset = modelformset_factory(
             PurchaseOrder, form=ProductForm, extra=0
         )
-        return order, products, ProductFormset
+        if request_post := request.POST:
+            data = {}
+            for i in request_post:
+                if i == 'csrfmiddlewaretoken':
+                    continue
+                if request_post[i]:
+                    data[i] = request_post[i]
+            if data:
+                self.update_order_doc(data, order_positions)
+        formset = ProductFormset(queryset=order_positions)
+        return order, formset
 
     @staticmethod
-    def get_context(formset, order, products):
+    def get_context(formset, order):
         context = {
-            'number': order.name,
+            'order': order,
             'product_formset': formset,
-            'len_doc': len(products),
-            'order_slug': order.slug
+            'len_doc': len(formset),
         }
         return context
 
-    def update_order_doc(self, data, products):
+    def update_order_doc(self, data: dict, order_positions):
         fact_updates = []
         comment_updates = []
+        labels = []
 
         for info in data:
             index = int(info.split('-')[1])
-            product = products[index]
+            product = order_positions[index]
             if 'plus' in info:
-                product.fact += int(data[info])
+                plus = int(data[info])
+                product.fact += plus
                 fact_updates.append(product)
+                labels.append((product, plus))
             if 'comment' in info:
                 if data[info] != product.comment:
                     product.comment = data[info]
@@ -179,6 +220,7 @@ class OrderDoc(View):
 
         if fact_updates:
             PurchaseOrder.objects.bulk_update(fact_updates, ['fact'])
+            create_label(labels)
 
         if comment_updates:
             PurchaseOrder.objects.bulk_update(comment_updates, ['comment'])
@@ -202,3 +244,85 @@ class DocUpdateView(generic.UpdateView):
     def get_success_url(self):
         slug = self.kwargs['slug']
         return reverse_lazy('purchaseorder:document', kwargs={'slug': slug})
+
+
+class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
+    def post(self, request, *args, **kwargs):
+        self.get_positions()
+        order_name = slugify(self.number['name'])
+        order = get_object_or_404(Order, slug=order_name)
+
+        with transaction.atomic():
+            for info in self.positions:
+                (product_id, name, barcodes,
+                 code, article, cell_number) = self.get_valid_data(info)
+                try:
+                    product = Product.objects.get(
+                        product_id=product_id
+                    )
+                except Product.DoesNotExist:
+                    product = Product.objects.create(
+                        product_id=product_id,
+                        name=name,
+                        barcodes=barcodes,
+                        code=code,
+                        article=article,
+                        cell_number=cell_number
+                    )
+                else:
+                    product.name = name
+                    product.barcodes = barcodes
+                    product.code = code
+                    product.article = article
+                    product.cell_number = cell_number
+                    product.save()
+
+                # Обновление или создание записи в PurchaseOrder
+                try:
+                    purchase_order = PurchaseOrder.objects.get(
+                        order=order,
+                        product=product
+                    )
+                except PurchaseOrder.DoesNotExist:
+                    purchase_order = PurchaseOrder(
+                        order=order,
+                        product=product
+                    )
+                purchase_order.quantity = info['quantity']
+                purchase_order.summ = info['price']
+                purchase_order.save()
+
+        return redirect('purchaseorder:document', order_name)
+
+
+def download_label(request):
+    file_path = os.path.join(
+        settings.BASE_DIR, 'media', 'pdf', 'products_label.pdf'
+    )
+    with open(file_path, 'rb') as file:
+        response = HttpResponse(
+            file.read(), content_type="application/pdf"
+        )
+        response['Content-Disposition'] = (
+            'attachment; filename="products_label.pdf"'
+        )
+        return response
+
+
+class CreateDownloadXcelDoc(View):
+    template_name = 'purchaseorder/create_download_xcel.html'
+
+    def get(self, request, *args, **kwargs):
+        self.order = Order.objects.get(order_id=kwargs['slug'])
+        self.order_positions = (
+            self.order.products.select_related('order', 'product')
+        )
+        create_report(self.order_positions, self.order)
+        context = self.get_context_data()
+        return render(request, self.template_name, context=context)
+
+    def get_context_data(self, **kwargs):
+        context = {}
+        context["order"] = self.order
+        context["count_product"] = len(self.order_positions)
+        return context
