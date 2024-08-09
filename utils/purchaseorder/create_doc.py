@@ -1,5 +1,3 @@
-import os
-from django.conf import settings
 from openpyxl import Workbook
 
 
@@ -28,11 +26,8 @@ def create_report(data, order):
 
         index += 1
 
-    file_path = os.path.join(
-        settings.MEDIA_ROOT, 'purchaseorder_doc',
-        f'Отчет_по_заказу_{order.name}.xlsx'
-    )
+    file_path = f'media/purchaseorder_doc/Отчет_по_заказу_{order.name}.xlsx'
 
-    a = work_book.save(file_path)
+    work_book.save(file_path)
     order.xl_doc = file_path
     order.save()

@@ -13,21 +13,15 @@
       </div>
         <div class="card-body ">
           <div class="card-header mb-3">
-            Документ: {{object.name}}
+            Документ: {{order.name}}
           </div>
           <div class="card-header mb-3">
-            Slug: {{object.slug}}
+            Создано: {{order.created_at}}
           </div>
           <div class="card-header mb-3">
-            Создано: {{object.created_at}}
+            Товаров в заказе: {{ count_product }}
           </div>
-        <form method="post">
-            {% csrf_token %}
-            {% comment %} <p>Вы уверены, что хотите удалить документ приемки"{{ object.name }}"?</p>
-            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-            <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:doc_list' %}">Назад</a>
-           </form> {% endcomment %}
-           
+          <a class="btn btn-success btn-sm" href="{% url 'pages:home' %}{{order.xl_doc}}"  download>Скачать шаблон</a>
         </div>
     </div>
   </div>

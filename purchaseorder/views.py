@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 import requests
 from django.shortcuts import redirect, get_object_or_404, render
@@ -312,8 +313,16 @@ class CreateDownloadXcelDoc(View):
     template_name = 'purchaseorder/create_download_xcel.html'
 
     def get(self, request, *args, **kwargs):
-        order = Order.objects.get(order_id=kwargs['slug'])
-        order_positions = order.products.select_related('order', 'product')
-        create_report(order_positions, order)
+        self.order = Order.objects.get(order_id=kwargs['slug'])
+        self.order_positions = (
+            self.order.products.select_related('order', 'product')
+        )
+        create_report(self.order_positions, self.order)
+        context = self.get_context_data()
+        return render(request, self.template_name, context=context)
 
-        return render(request, self.template_name, context={'a':'a'})
+    def get_context_data(self, **kwargs):
+        context = {}
+        context["order"] = self.order
+        context["count_product"] = len(self.order_positions)
+        return context
