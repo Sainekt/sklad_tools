@@ -2,8 +2,6 @@ from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.shortcuts import redirect, render
 from django.views import View
 
-import pyperclip
-
 from .forms import OzonForm, FormatingForm
 from .models import Ozon
 from utils.ozon.barcode_gen import barcode_gen, barcode_set
@@ -114,6 +112,5 @@ def edit_xl(request, pk):
         info.barcode,
         info.image,
     )
-    pyperclip.copy(info.barcode)
     excel_edit(choice_file_xl(info.xcel_shablon))
     return redirect('ozon:detail', pk=info.id)
