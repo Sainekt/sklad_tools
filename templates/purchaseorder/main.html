@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
   <h1>Делай свои грязные дела и проваливай.</h1>
-  <a class="btn btn-secondary btn-sm" href="{% url 'purchaseorder:doc_list' %}">Список созданых документов</a>
+  <a class="btn btn-dark btn" href="{% url 'purchaseorder:doc_list' %}">Список созданых документов</a>
     <table class="table table-striped">
     <thead>
       <tr>
@@ -22,7 +22,7 @@
         <td>{{ i.agent.name }}</td>
         <td>{{ i.sum|floatformat:2 }}</td>
         <td>{{ i.created }}</td>
-        <td><a class="btn btn-secondary btn-sm" href="{% url 'purchaseorder:order' i.id %}">Открыть</td></a></td>
+        <td><a class="btn btn-dark btn-sm" href="{% url 'purchaseorder:order' i.id %}">Открыть</td></a></td>
       </tr>
       {% endfor %}
     </tbody>
