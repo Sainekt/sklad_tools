@@ -24,7 +24,7 @@ urlpatterns = [
     ),
     path(
         'product/<int:pk>/update/<slug:slug>/',
-        views.DocUpdateView.as_view(),
+        views.DocUpdateProductView.as_view(),
         name='product_update'
     ),
     path('document/<slug:slug>/products_update',

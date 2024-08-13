@@ -236,7 +236,7 @@ class DocDeleteView(generic.DeleteView):
     success_url = reverse_lazy('purchaseorder:doc_list')
 
 
-class DocUpdateView(generic.UpdateView):
+class DocUpdateProductView(generic.UpdateView):
     model = PurchaseOrder
     form_class = FactForm
 
