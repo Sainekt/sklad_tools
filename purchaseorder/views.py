@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from dotenv import load_dotenv
 import requests
 from django.shortcuts import redirect, get_object_or_404, render
@@ -158,27 +157,22 @@ class CreateOrderDoc(
         return redirect('purchaseorder:document', order_name)
 
 
-class OrderDoc(View):
+class UpdateOrderDoc(View):
     """Работа с документом."""
     template_name = 'purchaseorder/create_doc.html'
 
     def get(self, request, slug):
-        order, formset = self.get_data(slug, request)
+        order, formset = self.get_data(request, slug)
         context = self.get_context(formset, order)
         return render(request, self.template_name, context=context)
 
     def post(self, request, slug):
-        order, formset = self.get_data(slug, request)
-        context = self.get_context(formset, order)
-        return render(request, self.template_name, context=context)
+        self.get_data(request, slug)
+        return redirect('purchaseorder:document', slug)
 
-    def get_data(self, slug, request):
+    def get_data(self, request, slug):
         order = get_object_or_404(Order, slug=slug)
         order_positions = order.products.select_related('order', 'product')
-
-        ProductFormset = modelformset_factory(
-            PurchaseOrder, form=ProductForm, extra=0
-        )
         if request_post := request.POST:
             data = {}
             for i in request_post:
@@ -188,6 +182,11 @@ class OrderDoc(View):
                     data[i] = request_post[i]
             if data:
                 self.update_order_doc(data, order_positions)
+            return
+
+        ProductFormset = modelformset_factory(
+            PurchaseOrder, form=ProductForm, extra=0
+        )
         formset = ProductFormset(queryset=order_positions)
         return order, formset
 
