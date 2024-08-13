@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% load static %}
-{% load django_bootstrap5 %}
-
+{% block title%}
+Шаблон №{{ object.id }}
+{% endblock title %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-10">

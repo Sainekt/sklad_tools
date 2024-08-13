@@ -8,7 +8,7 @@
   {% csrf_token %}
   <button type="submit" class="btn btn-dark btn">Обновить документ</button>
 </form>
-  <a class="btn btn-dark btn" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформировать файл</a>
+  <a class="btn btn-dark btn" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформироватьфайл</a>
 </div>
   <h1>Документ заказа: {{order.name}} </h1>
   <h3>Позиций в заказе: {{ len_doc }} </h3>
