@@ -53,10 +53,8 @@ class ListCreatePositionsDocMixin:
         dict_response = self.response(url, params=None).json()
         response = dict_response.get('rows')
         if not response:
-            raise Http404(
-                f'Ответ моего склада вернул: '
-                f'{dict_response.get('errors')[0].get('error')}'
-            )
+            error = dict_response.get('errors')[0].get('error')
+            raise Http404(f'Ответ моего склада вернул: {error}')
         self.positions_quantity = len(response)
         self.positions = response
 
@@ -96,10 +94,8 @@ class OrderList(ResponseMixin, generic.TemplateView):
         dict_response = self.response(url).json()
         response = dict_response.get('rows')
         if not response:
-            raise Http404(
-                f'Ответ моего склада вернул: '
-                f'{dict_response.get('errors')[0].get('error')}'
-            )
+            error = dict_response.get('errors')[0].get('error')
+            raise Http404(f'Ответ моего склада вернул: {error}')
         self.order_list = response
 
 
