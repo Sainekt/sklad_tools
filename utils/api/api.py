@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from django.conf import settings
 
 load_dotenv()
-TOKEN = os.getenv('token')
+TOKEN = os.getenv('ms_token')
 
 HEADERS = {
     'Authorization': f'Bearer {TOKEN}',

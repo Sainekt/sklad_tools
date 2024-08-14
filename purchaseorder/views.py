@@ -18,7 +18,7 @@ from utils.purchaseorder.create_doc import create_report
 
 load_dotenv()
 
-TOKEN = os.getenv('token')
+TOKEN = os.getenv('ms_token')
 if not TOKEN:
     raise ValueError('Требуется токен Моего скалада.')
 
