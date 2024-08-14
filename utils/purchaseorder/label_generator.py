@@ -82,4 +82,9 @@ def create_label(data):
             draw_name_and_code(product, pdf)
             draw_date_and_cell(product, pdf, products.order.created_at)
             pdf.showPage()
+
+        if len(data) > 1:  # если несколько товаров лента разделяется.
+            pdf.setFont('Noto-bold', 10)
+            pdf.drawCentredString(27*mm, 20*mm, '<<Разделитель>>')
+            pdf.showPage()
     pdf.save()
