@@ -4,7 +4,7 @@ import requests
 from django.shortcuts import redirect, get_object_or_404, render
 from django.conf import settings
 from django.urls import reverse_lazy
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from django.views import generic, View
 from django.db import transaction
@@ -50,7 +50,13 @@ class ListCreatePositionsDocMixin:
         )
         self.number = self.response(url).json()
         url += '/positions?expand=assortment'
-        response = self.response(url, params=None).json()['rows']
+        dict_response = self.response(url, params=None).json()
+        response = dict_response.get('rows')
+        if not response:
+            raise Http404(
+                f'Ответ моего склада вернул: '
+                f'{dict_response.get('errors')[0].get('error')}'
+            )
         self.positions_quantity = len(response)
         self.positions = response
 
@@ -87,8 +93,14 @@ class OrderList(ResponseMixin, generic.TemplateView):
     def get_order_list(self):
         url = ('https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder'
                '?order=created,desc&expand=agent')
-        response = self.response(url)
-        self.order_list = response.json()['rows']
+        dict_response = self.response(url).json()
+        response = dict_response.get('rows')
+        if not response:
+            raise Http404(
+                f'Ответ моего склада вернул: '
+                f'{dict_response.get('errors')[0].get('error')}'
+            )
+        self.order_list = response
 
 
 class OrderPositions(
@@ -285,7 +297,7 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
                 except PurchaseOrder.DoesNotExist:
                     purchase_order = PurchaseOrder(
                         order=order,
-                        product=product
+                        product=product,
                     )
                 except PurchaseOrder.MultipleObjectsReturned:
                     continue
