@@ -280,13 +280,15 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
                 try:
                     purchase_order = PurchaseOrder.objects.get(
                         order=order,
-                        product=product
+                        product=product,
                     )
                 except PurchaseOrder.DoesNotExist:
                     purchase_order = PurchaseOrder(
                         order=order,
                         product=product
                     )
+                except PurchaseOrder.MultipleObjectsReturned:
+                    continue
                 purchase_order.quantity = info['quantity']
                 purchase_order.summ = info['price']
                 purchase_order.save()
