@@ -1,8 +1,9 @@
 from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.shortcuts import redirect, render
 from django.views import View
+from django import forms
 
-from .forms import OzonForm, FormatingForm
+from .forms import OzonForm, FormatingForm, SearchForm
 from .models import Ozon
 from utils.ozon.barcode_gen import barcode_gen, barcode_set
 from utils.ozon.writer_ozon_form import (
@@ -10,6 +11,7 @@ from utils.ozon.writer_ozon_form import (
 )
 from utils.ozon import format_string as formating
 from utils.api.api import get_product
+from .utils import ParserTree
 
 SET_BARCODS = barcode_set
 
@@ -114,3 +116,40 @@ def edit_xl(request, pk):
     )
     excel_edit(choice_file_xl(info.xcel_shablon))
     return redirect('ozon:detail', pk=info.id)
+
+
+class DynamicForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        search_string = kwargs.pop('search_string', None)
+        super().__init__(*args, **kwargs)
+
+        # Добавляем поле, только если есть search_string
+        if search_string:
+            result = []
+            categories = ParserTree()
+            for cat_id, name in categories.categories:
+                if search_string.lower() in name.lower():
+                    result.append((cat_id, name))
+            if not result:
+                result = [(None, 'Не найдено категорий.')]
+            self.fields['description_category_id'] = forms.ChoiceField(
+                choices=result, widget=forms.Select, help_text='Категория'
+            )
+
+
+class FormView(View):
+    template_name = 'ozon/test_form.html'
+
+    def get(self, request, *args, **kwargs):
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid():
+            search_string = search_form.cleaned_data['cat_search']
+            form = DynamicForm(search_string=search_string)
+            if not search_string:
+                return render(request, self.template_name, context={
+                    'search_form': search_form,
+                })
+            return render(request, self.template_name, {
+                    'search_form': search_form,
+                    'form': form
+            })

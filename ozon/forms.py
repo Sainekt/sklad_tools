@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from .utils import ParserTree
 
 from .models import Ozon
 
@@ -40,3 +41,6 @@ class FormatingForm(forms.Form):
         {'cols': '22', 'rows': '5'}), required=False,
         help_text='Будет помещено в основную таблицу при отправке данных.'
     )
+
+class SearchForm(forms.Form):
+    cat_search = forms.CharField(required=False)
