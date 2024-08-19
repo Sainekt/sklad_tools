@@ -19,18 +19,14 @@
       </div>
       <div class="card-body">
         <form method='get' enctype="multipart/form-data" id='form1'>
-          {% csrf_token %}
           {% bootstrap_form search_form %}
           <div class="btn-group-vertical w-100"> 
-          {% bootstrap_button button_type="submit" content="Отправить" %}
+          {% bootstrap_button button_type="submit" content="Искать" %}
           </div>
-        </form>
-        {% if  form  %}
-        <form method='post' enctype="multipart/form-data" id='form1'>
-          {% csrf_token %}
-          {% bootstrap_form form %}
+          {% if  select_categories  %}
+            {% bootstrap_form select_categories %}
           <div class="btn-group-vertical w-100"> 
-          {% bootstrap_button button_type="submit" content="Отправить" %}
+            {% bootstrap_button button_type="submit" content="Выбрать" %}
           </div>
         </form>
         {% endif %}

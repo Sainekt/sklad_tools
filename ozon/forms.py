@@ -42,5 +42,6 @@ class FormatingForm(forms.Form):
         help_text='Будет помещено в основную таблицу при отправке данных.'
     )
 
+
 class SearchForm(forms.Form):
     cat_search = forms.CharField(required=False)

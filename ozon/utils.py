@@ -47,7 +47,7 @@ class ParserTree:
         return data
 
     def get_atributes(self, category: tuple):
-        cat_id, type_id = (53968796, 970707394)
+        cat_id, type_id = category
         url = 'https://api-seller.ozon.ru/v1/description-category/attribute'
         data = json.dumps({
             'description_category_id': cat_id,

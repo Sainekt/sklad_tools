@@ -2,6 +2,7 @@ from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.shortcuts import redirect, render
 from django.views import View
 from django import forms
+import ast
 
 from .forms import OzonForm, FormatingForm, SearchForm
 from .models import Ozon
@@ -118,38 +119,51 @@ def edit_xl(request, pk):
     return redirect('ozon:detail', pk=info.id)
 
 
-class DynamicForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        search_string = kwargs.pop('search_string', None)
+class CataForm(forms.Form):
+    def __init__(self, search_string, categories, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Добавляем поле, только если есть search_string
         if search_string:
             result = []
-            categories = ParserTree()
-            for cat_id, name in categories.categories:
+            for cat_id, name in categories:
                 if search_string.lower() in name.lower():
                     result.append((cat_id, name))
             if not result:
                 result = [(None, 'Не найдено категорий.')]
             self.fields['description_category_id'] = forms.ChoiceField(
-                choices=result, widget=forms.Select, help_text='Категория'
+                choices=result, widget=forms.Select, help_text='Категория',
+                required=False
             )
+
+
+class DynamicProductForm(forms.Form):
+    ...
 
 
 class FormView(View):
     template_name = 'ozon/test_form.html'
+    categories = ParserTree()
 
     def get(self, request, *args, **kwargs):
         search_form = SearchForm(request.GET)
-        if search_form.is_valid():
-            search_string = search_form.cleaned_data['cat_search']
-            form = DynamicForm(search_string=search_string)
-            if not search_string:
-                return render(request, self.template_name, context={
-                    'search_form': search_form,
-                })
-            return render(request, self.template_name, {
-                    'search_form': search_form,
-                    'form': form
+        search_string = search_form.data.get('cat_search')
+        choice_cata = ast.literal_eval(
+            search_form.data.get('description_category_id'))
+
+        select_categories = CataForm(
+            search_string=search_string,
+            categories=self.categories.categories,
+        )
+
+        if not search_string:
+            return render(request, self.template_name, context={
+                'search_form': search_form,
             })
+
+        if choice_cata:
+            self.categories.get_atributes(choice_cata)
+            select_categories.data = choice_cata
+
+        return render(request, self.template_name, {
+                'search_form': search_form,
+                'select_categories': select_categories
+        })

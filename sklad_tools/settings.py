@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'ozon.apps.OzonConfig',
     'purchaseorder.apps.PurchaseorderConfig',
     'django_bootstrap5',
+    'django_select2',
 ]
 
 MIDDLEWARE = [

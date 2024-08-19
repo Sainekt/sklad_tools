@@ -4,7 +4,9 @@ chardet==5.2.0
 charset-normalizer==3.3.2
 colorama==0.4.6
 Django==5.0.5
+django-appconf==1.0.6
 django-bootstrap5==24.2
+django-select2==8.2.1
 et-xmlfile==1.1.0
 idna==3.7
 isort==5.13.2
