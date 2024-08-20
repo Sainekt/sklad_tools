@@ -20,15 +20,16 @@
     {% csrf_token %}
     <table class="table table-sm table-striped">
       <thead>
+        <br>
         <tr class="table-secondary">
           <th scope="col">№</th>
           <th scope="col">Фото</th>
           <th scope="col">Название</th>
           <th scope="col">Код</th>
           <th scope="col">Баркод</th>
-          <th scope="col">Заказано</th>
+          <th scope="col">Заказ</th>
           <th scope="col">Факт</th>
-          <th scope="col">+Посчитано</th> <!-- Изменение размера колонки -->
+          <th scope="col">Плюс</th>
           <th scope="col">Комментарий</th>
           <th scope="col">корректировать</th>
         </tr>
@@ -46,7 +47,7 @@
           <td>{{ form.instance.quantity|floatformat:0 }}</td>
           {{ form.management_form }}
           <td>{{ form.instance.fact }}</td>
-          <td>{{ form.plus }}</td> <!-- Применение класса col-2 -->
+          <td>{{ form.plus }}</td>
           <td>{{ form.comment }}</td>
           <td><a class="btn btn-dark btn-sm" href="{% url 'purchaseorder:product_update' form.instance.id order.slug %}">Изменить факт</td></a></td>
         </tr>

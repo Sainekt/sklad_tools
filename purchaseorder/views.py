@@ -254,12 +254,14 @@ class UpdateOrderDoc(View):
             product = order_positions[index]
             if 'plus' in info:
                 plus = abs(int(data[info]))
+                if plus > 1000:
+                    raise ValueError('Значение не может быть больше 1000')
                 product.fact += plus
                 fact_updates.append(product)
                 labels.append((product, plus))
             if 'comment' in info:
                 if data[info] != product.comment:
-                    product.comment = data[info]
+                    product.comment = data[info][:250]
                     comment_updates.append(product)
 
         if fact_updates:

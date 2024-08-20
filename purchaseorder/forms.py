@@ -1,16 +1,25 @@
 from django.forms import ModelForm
+from django import forms
 from django.core.exceptions import ValidationError
 from .models import PurchaseOrder
 
 
 class ProductForm(ModelForm):
+    plus = forms.IntegerField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    comment = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        max_length=250
+    )
+
     class Meta:
         model = PurchaseOrder
         fields = ('plus', 'comment')
 
 
-class FactForm(ProductForm):
-    class Meta(ProductForm.Meta):
+class FactForm(ModelForm):
+    class Meta:
+        model = PurchaseOrder
         fields = ('fact', 'comment')
 
     def clean_fact(self):
