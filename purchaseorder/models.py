@@ -33,6 +33,11 @@ class Product(models.Model):
     image = models.ImageField(
         verbose_name='Фото', blank=True, upload_to='purchaseorder', null=True)
 
+    miniature = models.ImageField(
+        verbose_name='фото миниатюра', blank=True, upload_to='purchaseorder',
+        null=True
+    )
+
 
 class PurchaseOrder(models.Model):
     order = models.ForeignKey(

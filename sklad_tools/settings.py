@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['192.168.1.46', '127.0.0.1', 'localhost']
 
 MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
 INTERNAL_IPS = [
     '127.0.0.1',

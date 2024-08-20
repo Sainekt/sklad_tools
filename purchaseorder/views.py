@@ -49,7 +49,7 @@ class ListCreatePositionsDocMixin:
             f'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder/{pk}'
         )
         self.number = self.response(url).json()
-        url += '/positions?expand=assortment'
+        url += '/positions?expand=assortment.images'
         dict_response = self.response(url, params=None).json()
         response = dict_response.get('rows')
         if not response:
@@ -77,6 +77,40 @@ class ListCreatePositionsDocMixin:
         article = info['assortment'].get('article')
         cell_number = self.get_cell(info)
         return product_id, name, barcodes, code, article, cell_number
+
+    def get_image(self, info):
+        product_id = info['assortment'].get('id')
+        miniature_url = info['assortment']['images'].get('rows')
+        image_miniature = 'purchaseorder/preview.jpg'
+        if miniature_url:
+            miniature_url = (
+                miniature_url[0].get('miniature').get('downloadHref'))
+            image_miniature = (
+                self.download_image(product_id, miniature_url)
+                or image_miniature)
+        return image_miniature
+
+    def download_image(self, product_id, image_url):
+        response = requests.get(image_url, stream=True)
+        if response.status_code != 200:
+            return
+
+        content_type = response.headers.get('Content-Type')
+        if content_type:
+            extension = '.' + content_type.split('/')[1]
+        else:
+            return
+
+        file_path = os.path.join(
+            settings.MEDIA_ROOT, 'purchaseorder', product_id + extension)
+        media_path = 'purchaseorder/' + product_id + extension
+
+        with open(file_path, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    file.write(chunk)
+
+        return media_path
 
 
 class OrderList(ResponseMixin, generic.TemplateView):
@@ -142,13 +176,15 @@ class CreateOrderDoc(
                     product_id=product_id
                 )
             except Product.DoesNotExist:
+                miniature = self.get_image(info)
                 product = Product.objects.create(
                         product_id=product_id,
                         name=name,
                         barcodes=barcodes,
                         code=code,
                         article=article,
-                        cell_number=cell_number
+                        cell_number=cell_number,
+                        miniature=miniature
                 )
             new_obj = PurchaseOrder(
                 order=order,
@@ -204,6 +240,7 @@ class UpdateOrderDoc(View):
             'order': order,
             'product_formset': formset,
             'len_doc': len(formset),
+            'MEDIA_URL': settings.MEDIA_URL
         }
         return context
 
@@ -216,7 +253,7 @@ class UpdateOrderDoc(View):
             index = int(info.split('-')[1])
             product = order_positions[index]
             if 'plus' in info:
-                plus = int(data[info])
+                plus = abs(int(data[info]))
                 product.fact += plus
                 fact_updates.append(product)
                 labels.append((product, plus))
@@ -263,6 +300,7 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
             for info in self.positions:
                 (product_id, name, barcodes,
                  code, article, cell_number) = self.get_valid_data(info)
+                miniature = self.get_image(info)
                 try:
                     product = Product.objects.get(
                         product_id=product_id
@@ -274,7 +312,8 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
                         barcodes=barcodes,
                         code=code,
                         article=article,
-                        cell_number=cell_number
+                        cell_number=cell_number,
+                        miniature=miniature
                     )
                 else:
                     product.name = name
@@ -282,6 +321,7 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
                     product.code = code
                     product.article = article
                     product.cell_number = cell_number
+                    product.miniature = miniature
                     product.save()
 
                 # Обновление или создание записи в PurchaseOrder

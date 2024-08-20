@@ -14,32 +14,39 @@
   <h3>Позиций в заказе: {{ len_doc }} </h3>
   <br>
   <a class="btn btn-primary btn" href="{% url 'purchaseorder:download_label' %}"  download>Скачать этикетку</a>
+  <br>
+
   <form method="post">
     {% csrf_token %}
     <table class="table table-sm table-striped">
       <thead>
-        <tr>
+        <tr class="table-secondary">
           <th scope="col">№</th>
+          <th scope="col">Фото</th>
           <th scope="col">Название</th>
           <th scope="col">Код</th>
           <th scope="col">Баркод</th>
           <th scope="col">Заказано</th>
           <th scope="col">Факт</th>
-          <th scope="col">+Посчитано</th>
+          <th scope="col">+Посчитано</th> <!-- Изменение размера колонки -->
           <th scope="col">Комментарий</th>
+          <th scope="col">корректировать</th>
         </tr>
       </thead>
       <tbody>
         {% for form in product_formset %}
         <tr>
           <td>{{ forloop.counter }}</td>
+          <td class="text-center">
+            <img src="{{ MEDIA_URL }}{{ form.instance.product.miniature }}" width="85" height="85">
+          </td>
           <td>{{ form.instance.product.name }}</td>
           <td>{{ form.instance.product.code }}</td>
           <td>{{ form.instance.product.barcodes }}</td>
           <td>{{ form.instance.quantity|floatformat:0 }}</td>
           {{ form.management_form }}
           <td>{{ form.instance.fact }}</td>
-          <td>{{ form.plus }}</td>
+          <td>{{ form.plus }}</td> <!-- Применение класса col-2 -->
           <td>{{ form.comment }}</td>
           <td><a class="btn btn-dark btn-sm" href="{% url 'purchaseorder:product_update' form.instance.id order.slug %}">Изменить факт</td></a></td>
         </tr>
