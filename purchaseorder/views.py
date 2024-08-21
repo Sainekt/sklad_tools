@@ -49,13 +49,35 @@ class DetailUpdateMixin(ResponseMixin):
             return
         return response
 
+    def get_valid_info(self, response):
+        miniature = ''
+        image = ''
+        resp = response.json()
+        pk = resp.get('id')
+        name = resp.get('name')
+        if not pk or not name:
+            return
+        code = resp.get('code')
+        article = resp.get('article')
+        barcodes = resp.get('barcodes')
+        attributes = resp.get('attributes')
+        cell = ListCreatePositionsDocMixin.get_cell(attributes)
+        miniature_resp = resp.get('images').get('rows')
+        if miniature_resp:
+            miniature_url = miniature_resp[0]['miniature']['downloadHref']
+            miniature = ListCreatePositionsDocMixin.download_image(
+                pk, miniature_url
+            )
+            image = self.download_big_size_photo(resp)
+        return (
+            pk, name, code, article, barcodes, cell, miniature, image
+        )
+
     def download_big_size_photo(self, response):
-        response = response.json()
         try:
             pk = response['id']
             images = response['images']['rows']
             images_download_url = images[0]['meta']['downloadHref']
-            print(images_download_url)
         except LookupError:
             return
         image = ListCreatePositionsDocMixin.download_image(
@@ -65,7 +87,6 @@ class DetailUpdateMixin(ResponseMixin):
 
 
 class ListCreatePositionsDocMixin:
-    cell_id = '17bbadc0-786b-11ec-0a80-06bd004b0ee2'
 
     def get_positions(self):
         pk = self.kwargs['slug']
@@ -76,18 +97,20 @@ class ListCreatePositionsDocMixin:
         url += '/positions?expand=assortment.images'
         dict_response = self.response(url, params=None).json()
         response = dict_response.get('rows')
-        if not response:
-            error = dict_response.get('errors')[0].get('error')
+        errors = dict_response.get('errors')
+        if errors:
+            error = errors[0].get('error')
             raise Http404(f'Ответ моего склада вернул: {error}')
         self.positions_quantity = len(response)
         self.positions = response
 
-    def get_cell(self, info):
-        cell_attr = info['assortment'].get('attributes')
+    @staticmethod
+    def get_cell(cell_attr):
+        cell_id = '17bbadc0-786b-11ec-0a80-06bd004b0ee2'
         cell_value = ''
         if cell_attr:
             for cell in cell_attr:
-                if cell['id'] == self.cell_id:
+                if cell['id'] == cell_id:
                     cell_value = cell['value']
 
         return cell_value
@@ -99,7 +122,8 @@ class ListCreatePositionsDocMixin:
         barcodes = str(info['assortment'].get('barcodes'))
         code = info['assortment'].get('code')
         article = info['assortment'].get('article')
-        cell_number = self.get_cell(info)
+        cell_attr = info['assortment'].get('attributes')
+        cell_number = self.get_cell(cell_attr)
         return product_id, name, barcodes, code, article, cell_number
 
     def get_image(self, info):
@@ -391,7 +415,7 @@ class ProductDetail(DetailUpdateMixin, generic.DetailView):
         if not self.object.image:
             response = self.get_postition(self.object.product_id)
             if response:
-                photo_path = self.download_big_size_photo(response)
+                photo_path = self.download_big_size_photo(response.json())
                 self.object.image = photo_path
                 self.object.save()
         context = self.get_context_data(object=self.object)
@@ -401,7 +425,23 @@ class ProductDetail(DetailUpdateMixin, generic.DetailView):
 class ProductUpdateView(DetailUpdateMixin, View):
 
     def post(self, request, *args, **kwargs):
-        ...
+        product = get_object_or_404(Product, product_id=kwargs['slug'])
+        position = self.get_postition(kwargs['slug'])
+        if not position:
+            raise Http404('Товар с таким id не найден на сайте Мой Склад')
+        (pk, name, code, article,
+         barcodes, cell, miniature, image) = self.get_valid_info(position)
+        if pk != kwargs['slug']:
+            return ValueError('ID из МС не совпадает с запрошеным ID')
+        product.name = name
+        product.code = code
+        product.article = article
+        product.barcodes = barcodes
+        product.cell_number = cell
+        product.miniature = miniature
+        product.image = image
+        product.save()
+        return redirect('purchaseorder:product_detail', kwargs['slug'])
 
 
 def download_label(request):
