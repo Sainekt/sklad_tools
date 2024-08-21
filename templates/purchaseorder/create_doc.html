@@ -41,7 +41,7 @@
           <td class="text-center">
             <img src="{{ MEDIA_URL }}{{ form.instance.product.miniature }}" width="85" height="85">
           </td>
-          <td><a href="{% url 'purchaseorder:product_detail' form.instance.product.product_id %}">
+          <td><a class="link-offset-2 link-underline link-underline-opacity-0" href="{% url 'purchaseorder:product_detail' form.instance.product.product_id %}">
             {{ form.instance.product.name }}</a></td>
           <td>{{ form.instance.product.code }}</td>
           <td>{{ form.instance.product.barcodes }}</td>
