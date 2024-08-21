@@ -29,6 +29,8 @@ urlpatterns = [
     ),
     path('document/<slug:slug>/products_update',
          views.DocUpdateProducts.as_view(), name='update_products'),
+    path('product/detail/<slug:slug>/',
+         views.ProductDetail.as_view(), name='product_detail'),
     path('download-label/', views.download_label, name='download_label'),
     path('create_xcel/<slug:slug>/',
          views.CreateDownloadXcelDoc.as_view(), name='download_doc'),

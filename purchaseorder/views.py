@@ -40,6 +40,30 @@ class ResponseMixin:
         )
 
 
+class DetailUpdateMixin(ResponseMixin):
+    url = 'https://api.moysklad.ru/api/remap/1.2/entity/product/'
+
+    def get_postition(self, pk):
+        response = self.response(self.url + pk + '/?expand=images')
+        if response.status_code != 200:
+            return
+        return response
+
+    def download_big_size_photo(self, response):
+        response = response.json()
+        try:
+            pk = response['id']
+            images = response['images']['rows']
+            images_download_url = images[0]['meta']['downloadHref']
+            print(images_download_url)
+        except LookupError:
+            return
+        image = ListCreatePositionsDocMixin.download_image(
+            pk, images_download_url, 'BIG'
+        )
+        return image
+
+
 class ListCreatePositionsDocMixin:
     cell_id = '17bbadc0-786b-11ec-0a80-06bd004b0ee2'
 
@@ -90,8 +114,9 @@ class ListCreatePositionsDocMixin:
                 or image_miniature)
         return image_miniature
 
-    def download_image(self, product_id, image_url):
-        response = requests.get(image_url, stream=True)
+    @staticmethod
+    def download_image(product_id, image_url, prefix=''):
+        response = requests.get(image_url, headers=HEADERS, stream=True)
         if response.status_code != 200:
             return
 
@@ -102,8 +127,9 @@ class ListCreatePositionsDocMixin:
             return
 
         file_path = os.path.join(
-            settings.MEDIA_ROOT, 'purchaseorder', product_id + extension)
-        media_path = 'purchaseorder/' + product_id + extension
+            settings.MEDIA_ROOT,
+            'purchaseorder', product_id + prefix + extension)
+        media_path = 'purchaseorder/' + product_id + prefix + extension
 
         with open(file_path, 'wb') as file:
             for chunk in response.iter_content(chunk_size=1024):
@@ -346,6 +372,38 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
         return redirect('purchaseorder:document', order_name)
 
 
+class ProductDetail(DetailUpdateMixin, generic.DetailView):
+    template_name = 'purchaseorder/product_detail.html'
+    model = Product
+
+    def get_object(self):
+        return get_object_or_404(
+            self.model, product_id=self.kwargs[self.slug_url_kwarg]
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["MEDIA_URL"] = settings.MEDIA_URL
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object.image:
+            response = self.get_postition(self.object.product_id)
+            if response:
+                photo_path = self.download_big_size_photo(response)
+                self.object.image = photo_path
+                self.object.save()
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+
+class ProductUpdateView(DetailUpdateMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        ...
+
+
 def download_label(request):
     file_path = os.path.join(
         settings.BASE_DIR, 'media', 'pdf', 'products_label.pdf'
@@ -376,4 +434,5 @@ class CreateDownloadXcelDoc(View):
         context = {}
         context["order"] = self.order
         context["count_product"] = len(self.order_positions)
+        context["MEDIA_URL"] = settings.MEDIA_URL
         return context
