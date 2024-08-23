@@ -5,7 +5,8 @@ from django.shortcuts import redirect, get_object_or_404, render
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.http import HttpResponse, Http404
-
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 from django.views import generic, View
 from django.db import transaction
 from django.forms import modelformset_factory
@@ -260,6 +261,7 @@ class UpdateOrderDoc(View):
         context = self.get_context(formset, order)
         return render(request, self.template_name, context=context)
 
+    @method_decorator(ratelimit(key='ip', rate='1/5s', method='POST'))
     def post(self, request, slug):
         self.get_data(request, slug)
         return redirect('purchaseorder:document', slug)
