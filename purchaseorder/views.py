@@ -211,6 +211,7 @@ class CreateOrderDoc(
     ListCreatePositionsDocMixin,
     View
 ):
+    @method_decorator(ratelimit(key='ip', rate='1/1m', method='POST'))
     def post(self, request, *args, **kwargs):
 
         try:
@@ -356,7 +357,7 @@ class DocDeleteView(generic.DeleteView):
     success_url = reverse_lazy('purchaseorder:doc_list')
 
 
-class DocUpdateProductView(generic.UpdateView):
+class DocUpdateProductFactView(generic.UpdateView):
     model = PurchaseOrder
     form_class = FactForm
 
@@ -366,6 +367,8 @@ class DocUpdateProductView(generic.UpdateView):
 
 
 class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
+
+    @method_decorator(ratelimit(key='ip', rate='1/1m', method='POST'))
     def post(self, request, *args, **kwargs):
         self.get_positions()
         order_name = slugify(self.number['name'])

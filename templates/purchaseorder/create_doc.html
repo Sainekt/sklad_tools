@@ -50,7 +50,7 @@
           <td>{{ form.instance.fact }}</td>
           <td>{{ form.plus }}</td>
           <td>{{ form.comment }}</td>
-          <td><a class="btn btn-dark btn-sm" href="{% url 'purchaseorder:product_update' form.instance.id order.slug %}">Изменить факт</td></a></td>
+          <td><a class="btn btn-dark btn-sm" href="{% url 'purchaseorder:product_update_fact' form.instance.id order.slug %}">Изменить факт</td></a></td>
         </tr>
         {% endfor %}
       </tbody>
