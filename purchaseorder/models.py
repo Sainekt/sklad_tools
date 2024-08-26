@@ -37,6 +37,7 @@ class Product(models.Model):
         verbose_name='фото миниатюра', blank=True, upload_to='purchaseorder',
         null=True
     )
+    description = models.TextField('Описание', blank=True, null=True)
 
 
 class PurchaseOrder(models.Model):

@@ -62,6 +62,7 @@ class DetailUpdateMixin(ResponseMixin):
         article = resp.get('article')
         barcodes = resp.get('barcodes')
         attributes = resp.get('attributes')
+        description = resp.get('description')
         cell = ListCreatePositionsDocMixin.get_cell(attributes)
         miniature_resp = resp.get('images').get('rows')
         if miniature_resp:
@@ -71,7 +72,8 @@ class DetailUpdateMixin(ResponseMixin):
             )
             image = self.download_big_size_photo(resp)
         return (
-            pk, name, code, article, barcodes, cell, miniature, image
+            pk, name, code, article, barcodes, cell, miniature, image,
+            description,
         )
 
     def download_big_size_photo(self, response):
@@ -125,7 +127,11 @@ class ListCreatePositionsDocMixin:
         article = info['assortment'].get('article')
         cell_attr = info['assortment'].get('attributes')
         cell_number = self.get_cell(cell_attr)
-        return product_id, name, barcodes, code, article, cell_number
+        description = info['assortment'].get('description')
+        return (
+            product_id, name, barcodes, code, article, cell_number,
+            description
+        )
 
     def get_image(self, info):
         product_id = info['assortment'].get('id')
@@ -221,11 +227,25 @@ class CreateOrderDoc(
 
         for info in self.positions:
             (product_id, name, barcodes,
-             code, article, cell_number) = self.get_valid_data(info)
+             code, article, cell_number,
+             description) = self.get_valid_data(info)
             try:
                 product = Product.objects.get(
                     product_id=product_id
                 )
+                if (product.name != name
+                        or product.barcodes != barcodes
+                        or product.code != code
+                        or product.article != article
+                        or product.cell_number != cell_number
+                        or product.description != description):
+                    product.name = name
+                    product.barcodes = barcodes
+                    product.code = code
+                    product.article = article
+                    product.cell_number = cell_number
+                    product.description = description
+                    product.save()
             except Product.DoesNotExist:
                 miniature = self.get_image(info)
                 product = Product.objects.create(
@@ -235,7 +255,8 @@ class CreateOrderDoc(
                         code=code,
                         article=article,
                         cell_number=cell_number,
-                        miniature=miniature
+                        miniature=miniature,
+                        description=description,
                 )
             new_obj = PurchaseOrder(
                 order=order,
@@ -353,7 +374,8 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
         with transaction.atomic():
             for info in self.positions:
                 (product_id, name, barcodes,
-                 code, article, cell_number) = self.get_valid_data(info)
+                 code, article, cell_number,
+                 description, ) = self.get_valid_data(info)
                 miniature = self.get_image(info)
                 try:
                     product = Product.objects.get(
@@ -367,7 +389,8 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
                         code=code,
                         article=article,
                         cell_number=cell_number,
-                        miniature=miniature
+                        miniature=miniature,
+                        description=description,
                     )
                 else:
                     product.name = name
@@ -376,6 +399,7 @@ class DocUpdateProducts(ResponseMixin, ListCreatePositionsDocMixin, View):
                     product.article = article
                     product.cell_number = cell_number
                     product.miniature = miniature
+                    product.description = description
                     product.save()
 
                 # Обновление или создание записи в PurchaseOrder
@@ -432,7 +456,8 @@ class ProductUpdateView(DetailUpdateMixin, View):
         if not position:
             raise Http404('Товар с таким id не найден на сайте Мой Склад')
         (pk, name, code, article,
-         barcodes, cell, miniature, image) = self.get_valid_info(position)
+         barcodes, cell, miniature,
+         image, description) = self.get_valid_info(position)
         if pk != kwargs['slug']:
             return ValueError('ID из МС не совпадает с запрошеным ID')
         product.name = name
@@ -442,6 +467,7 @@ class ProductUpdateView(DetailUpdateMixin, View):
         product.cell_number = cell
         product.miniature = miniature
         product.image = image
+        product.description = description
         product.save()
         return redirect('purchaseorder:product_detail', kwargs['slug'])
 

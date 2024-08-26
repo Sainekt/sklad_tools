@@ -18,16 +18,21 @@
         <hr>
         <h5>
           Наименование:<br> 
-          <h5>{{ object.name }} <hr>
-          Штрих-коды: <br> {{ object.barcodes }}
+          {{ object.name }}
           <hr>
-          Артикул:<br> {{ object.article }} <br>
+          Описание:<br>
+          {{ object.description|linebreaks }}
+          <hr>
+          Штрих-коды: <br> {{ object.barcodes }}
           <hr>
           Код:<br>
           {{ object.code }}
           <hr>
+          Артикул:<br> {{ object.article }} <br>
+          <hr>
           Номер ячейки:<br>
-          {{ object.cell_number }}</h5>
+          {{ object.cell_number }}
+        </h5>
       </div>
     </div>
   </div>
