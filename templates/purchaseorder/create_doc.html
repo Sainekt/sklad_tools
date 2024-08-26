@@ -3,13 +3,13 @@
   Работа с документом {{number}}
 {% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between">
 <form method="POST" action="{% url 'purchaseorder:update_products' order.order_id %}">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-dark btn">Обновить документ</button>
+  <div class="d-flex justify-content-between">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-dark btn">Обновить документ</button>
+    <a class="btn btn-dark btn" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформироватьфайл</a>
+  </div>
 </form>
-  <a class="btn btn-dark btn" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформироватьфайл</a>
-</div>
   <h1>Документ заказа: {{order.name}} </h1>
   <h3>Позиций в заказе: {{ len_doc }} </h3>
   <br>
@@ -44,7 +44,8 @@
           <td><a class="link-offset-2 link-underline link-underline-opacity-0" href="{% url 'purchaseorder:product_detail' form.instance.product.product_id %}">
             {{ form.instance.product.name }}</a></td>
           <td>{{ form.instance.product.code }}</td>
-          <td>{{ form.instance.product.barcodes }}</td>
+          <td>{% if form.instance.product.barcodes %}
+            {{ form.instance.product.barcodes }}{% else %}{% endif %}</td>
           <td>{{ form.instance.quantity|floatformat:0 }}</td>
           {{ form.management_form }}
           <td>{{ form.instance.fact }}</td>

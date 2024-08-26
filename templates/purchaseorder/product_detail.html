@@ -4,8 +4,11 @@
 {% endblock title %}
 {% block content %}
 <form method="POST" action="{% url 'purchaseorder:product_detail_update' object.product_id %}">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-dark btn">Обновить товар</button>
+  <div class="d-flex justify-content-between">
+    <a href="{{ back_page }}" class="btn btn-primary" role="button" style="width: 150px">Назад</a>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-dark">Обновить товар</button>
+  </div>
 </form>
 <div class="row justify-content-center">
   <div class="col-md-10">

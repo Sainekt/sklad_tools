@@ -3,15 +3,21 @@
   Просмотр документа {{number.name}}
 {% endblock %}
 {% block content %}
-  <h1>Заказ {{number.name}} </h1>
-  <h3>Позиций в заказе: {{ positions_quantity }} </h3>
-  <br>
   <form method="POST" action="{% url 'purchaseorder:create_doc' number.id %}">
+    <div class="d-flex justify-content-between">
+    <a href="{{ back_page }}" class="btn btn-primary" role="button" style="width: 150px">Назад</a>
     {% csrf_token %}
     <input type="hidden" id="api_data" name="api_data">
-    <button type="submit" class="btn btn-primary">Создать документ</button>
+    <button type="submit" class="btn btn-dark">Создать документ</button>
+    </div>
 </form>
-  <br>
+<h4>Позиций в заказе: {{ positions_quantity }}</h4>
+  <div class="card text-center">
+    <div class="card-header"><h5>
+      Позиции в заказe № {{number.name}}
+      </h5>
+    </div>
+  <div class="card-body">
   <table class="table table-sm table-striped">
     <thead>
       <tr>
@@ -20,7 +26,7 @@
         <th scope="col">Код</th>
         <th scope="col">Баркод</th>
         <th scope="col">Сумма</th>
-        <th scope="col">Заказано шт</th>
+        <th scope="col">Заказано</th>
       </tr>
     </thead>
     <tbody>
@@ -36,4 +42,6 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
+</div>
 {% endblock %}

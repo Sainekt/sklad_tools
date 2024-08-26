@@ -51,8 +51,8 @@ class DetailUpdateMixin(ResponseMixin):
         return response
 
     def get_valid_info(self, response):
-        miniature = ''
-        image = ''
+        miniature = 'purchaseorder/preview.jpg'
+        image = 'purchaseorder/previewBIG.jpg'
         resp = response.json()
         pk = resp.get('id')
         name = resp.get('name')
@@ -122,7 +122,9 @@ class ListCreatePositionsDocMixin:
         if not (product_id := info['assortment'].get('id')):
             raise ValueError('ID товара не получено от Моего склада.')
         name = info['assortment'].get('name')
-        barcodes = str(info['assortment'].get('barcodes'))
+        barcodes = None
+        if barcodes := info['assortment'].get('barcodes'):
+            barcodes = str(barcodes)
         code = info['assortment'].get('code')
         article = info['assortment'].get('article')
         cell_attr = info['assortment'].get('attributes')
@@ -203,6 +205,7 @@ class OrderPositions(
         context["context"] = self.positions
         context['number'] = self.number
         context['positions_quantity'] = self.positions_quantity
+        context["back_page"] = self.request.META.get('HTTP_REFERER')
         return context
 
 
@@ -437,6 +440,7 @@ class ProductDetail(DetailUpdateMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["MEDIA_URL"] = settings.MEDIA_URL
+        context["back_page"] = self.request.META.get('HTTP_REFERER')
         return context
 
     def get(self, request, *args, **kwargs):
@@ -506,4 +510,5 @@ class CreateDownloadXcelDoc(View):
         context["order"] = self.order
         context["count_product"] = len(self.order_positions)
         context["MEDIA_URL"] = settings.MEDIA_URL
+        context["back_page"] = self.request.META.get('HTTP_REFERER')
         return context

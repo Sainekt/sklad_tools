@@ -56,7 +56,7 @@ def draw_date_and_cell(product, pdf, date):
 
 def clear_barcodes(product):
     barcode = product.barcodes
-    if barcode == 'None':
+    if barcode == 'None' or barcode is None:
         return
     barcods = barcode.split(':')[1]
     barcod = barcods.split("'")[1]
