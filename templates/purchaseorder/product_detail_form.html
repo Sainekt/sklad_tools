@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title%}
+Сформировать этикетку
+{% endblock title %}
+{% block content %}
+  <div class="d-flex justify-content-between">
+    <a href="{{ back_page }}" class="btn btn-primary" role="button" style="width: 150px">Назад</a>
+  </div>
+  <div class="row justify-content-center"> 
+    <div class="col-md-8">
+      <div class="card text-white bg-dark mb-3 text-center">
+        <div class="card-header">
+          Сформировать этикетку
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+          <div class="btn-group-vertical w-100"> 
+            {% bootstrap_button button_type="submit" content="Получить этикетку" %}
+          </div>
+        </form>
+      </div>
+    </div>
+{% endblock content %}

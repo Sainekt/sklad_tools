@@ -58,6 +58,8 @@ def clear_barcodes(product):
     barcode = product.barcodes
     if barcode == 'None' or barcode is None:
         return
+    if ':' not in barcode:
+        return barcode
     barcods = barcode.split(':')[1]
     barcod = barcods.split("'")[1]
     return barcod
@@ -87,4 +89,21 @@ def create_label(data):
             pdf.setFont('Noto-bold', 10)
             pdf.drawCentredString(27*mm, 20*mm, '<<Разделитель>>')
             pdf.showPage()
+    pdf.save()
+
+
+def create_user_label(data, date):
+    pdf = canvas.Canvas(
+        filename=f'media/pdf/{data.product_id}.pdf', pagesize=(57*mm, 40*mm)
+    )
+    barcode = clear_barcodes(data)
+    if barcode:
+        qr_draw(pdf, text=barcode, x='45mm', y='1mm', size='1cm')
+        barcode_draw = code128.Code128(
+            barcode, humanReadable=True,
+            barHeight=5*mm, barWidth=0.3*mm
+        )
+        barcode_draw.drawOn(pdf, x=-2*mm, y=14*mm)
+    draw_name_and_code(data, pdf)
+    draw_date_and_cell(data, pdf, date)
     pdf.save()

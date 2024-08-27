@@ -13,8 +13,9 @@ from django.forms import modelformset_factory
 from pytils.translit import slugify
 
 from .models import PurchaseOrder, Order, Product
-from .forms import ProductForm, FactForm
-from utils.purchaseorder.label_generator import create_label
+from .forms import ProductForm, FactForm, DetailLabelForm
+from utils.purchaseorder.label_generator import (
+    create_label, create_user_label)
 from utils.purchaseorder.create_doc import create_report
 
 load_dotenv()
@@ -479,9 +480,9 @@ class ProductUpdateView(DetailUpdateMixin, View):
         return redirect('purchaseorder:product_detail', kwargs['slug'])
 
 
-def download_label(request):
+def download_label(request, file_name='products_label'):
     file_path = os.path.join(
-        settings.BASE_DIR, 'media', 'pdf', 'products_label.pdf'
+        settings.BASE_DIR, 'media', 'pdf', f'{file_name}.pdf'
     )
     with open(file_path, 'rb') as file:
         response = HttpResponse(
@@ -510,5 +511,31 @@ class CreateDownloadXcelDoc(View):
         context["order"] = self.order
         context["count_product"] = len(self.order_positions)
         context["MEDIA_URL"] = settings.MEDIA_URL
+        context["back_page"] = self.request.META.get('HTTP_REFERER')
+        return context
+
+
+class ProductCreateLabelForm(generic.UpdateView):
+    """Для создания этикетки с нужной информацией"""
+    form_class = DetailLabelForm
+    model = Product
+    template_name = 'purchaseorder/product_detail_form.html'
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        obj.name = form.instance.name
+        obj.code = form.instance.code
+        obj.barcodes = form.instance.barcodes
+        obj.cell_number = form.instance.cell_number
+        create_user_label(obj, form.cleaned_data['date'])
+        response = download_label(None, obj.product_id)
+        file_path = os.path.join(
+            settings.BASE_DIR, 'media', 'pdf', f'{obj.product_id}.pdf'
+        )
+        os.remove(file_path)
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context["back_page"] = self.request.META.get('HTTP_REFERER')
         return context

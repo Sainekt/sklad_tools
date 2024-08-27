@@ -36,4 +36,6 @@ urlpatterns = [
     path('download-label/', views.download_label, name='download_label'),
     path('create_xcel/<slug:slug>/',
          views.CreateDownloadXcelDoc.as_view(), name='download_doc'),
+    path('product/detail/<int:pk>/label_form/',
+         views.ProductCreateLabelForm.as_view(), name='get_label_form'),
 ]
