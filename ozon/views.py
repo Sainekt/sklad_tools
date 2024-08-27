@@ -1,5 +1,6 @@
 from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.shortcuts import redirect, render
+from django.conf import settings
 from django.views import View
 
 from .forms import OzonForm, FormatingForm
@@ -33,6 +34,11 @@ class XlFormCreateView(CreateView):
 
 class XlFormDetailView(DetailView):
     model = Ozon
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["MEDIA_URL"] = settings.MEDIA_URL
+        return context
 
 
 class XlFormUpdateView(UpdateView):

@@ -22,6 +22,6 @@
 </div>
 </div>
 
-    <a class="btn btn-success btn-sm" href="{% url 'pages:home' %}{{object.xcel_shablon}}"  download>Скачать шаблон</a>
+    <a class="btn btn-success btn-sm" href="{{MEDIA_URL}}{{object.xcel_shablon}}"  download>Скачать шаблон</a>
     <a class="btn btn-dark btn-sm" href="{% url 'ozon:edit' object.id %}">Редактировать</a>
 {% endblock content %}
