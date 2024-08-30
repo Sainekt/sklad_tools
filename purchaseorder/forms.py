@@ -33,6 +33,7 @@ class DetailLabelForm(ModelForm):
     date = forms.DateField(
         label='Дата приемки',
         widget=forms.DateInput(attrs={'type': 'date'}))
+    big = forms.BooleanField(label='Большая', required=False)
 
     class Meta:
         model = Product

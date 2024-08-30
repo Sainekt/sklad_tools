@@ -15,7 +15,7 @@ from pytils.translit import slugify
 from .models import PurchaseOrder, Order, Product
 from .forms import ProductForm, FactForm, DetailLabelForm
 from utils.purchaseorder.label_generator import (
-    create_label, create_user_label)
+    create_label, create_user_label, create_big_label)
 from utils.purchaseorder.create_doc import create_report
 
 load_dotenv()
@@ -527,11 +527,18 @@ class ProductCreateLabelForm(generic.UpdateView):
         obj.code = form.instance.code
         obj.barcodes = form.instance.barcodes
         obj.cell_number = form.instance.cell_number
-        create_user_label(obj, form.cleaned_data['date'])
-        response = download_label(None, obj.product_id)
-        file_path = os.path.join(
-            settings.BASE_DIR, 'media', 'pdf', f'{obj.product_id}.pdf'
-        )
+        if form.cleaned_data['big']:
+            create_big_label(obj, form.cleaned_data['date'])
+            response = download_label(None, obj.product_id + 'BIG')
+            file_path = os.path.join(
+                settings.BASE_DIR, 'media', 'pdf', f'{obj.product_id}BIG.pdf'
+            )
+        else:
+            create_user_label(obj, form.cleaned_data['date'])
+            response = download_label(None, obj.product_id)
+            file_path = os.path.join(
+                settings.BASE_DIR, 'media', 'pdf', f'{obj.product_id}.pdf'
+            )
         os.remove(file_path)
         return response
 

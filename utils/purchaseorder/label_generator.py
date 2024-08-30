@@ -107,3 +107,61 @@ def create_user_label(data, date):
     draw_name_and_code(data, pdf)
     draw_date_and_cell(data, pdf, date)
     pdf.save()
+
+
+def draw_big_name_and_code(product, pdf):
+    def get_center(text, size):
+        x = 120 * mm / 2 - len(text)*size
+        if x < 2:
+            x = 5
+        return x
+    pdf.setFont('Noto', 20)
+    result = ''
+    x = 2*mm
+    y = 72*mm
+    for i in range(len(product.name)):
+        if i > 100:
+            break
+        if i % 30 == 0:
+            pdf.drawString(x, y, result)
+            result = ''
+            if y < 26.5:
+                y = 26.5
+            else:
+                y -= 6*mm
+
+        result += product.name[i]
+    else:
+        x = get_center(product.name, 2)
+        pdf.drawString(x, y, result)
+    pdf.setFont('Noto-bold', 35)
+    x = get_center(product.code, 12)
+    pdf.drawString(x, 40*mm, product.code)
+
+
+def draw_big_date_and_cell(product, pdf, date):
+    pdf.setFont('Noto', 10)
+    formatted_date = date.strftime("%d-%m-%Y")
+    pdf.drawString(2, 10, str(formatted_date))
+    pdf.setFont('Noto-bold', 20)
+    if product.cell_number:
+        pdf.drawRightString(98*mm, 10, product.cell_number[:20])
+
+
+def create_big_label(data, date):
+    pdf = canvas.Canvas(
+        filename=f'media/pdf/{data.product_id}BIG.pdf',
+        pagesize=(120*mm, 75*mm)
+    )
+    barcode = clear_barcodes(data)
+    if barcode:
+        qr_draw(pdf, text=barcode, x='98mm', y='3mm', size='2cm')
+        qr_draw(pdf, text=barcode, x='0mm', y='7mm', size='15mm')
+        barcode_draw = code128.Code128(
+            barcode, humanReadable=True,
+            barHeight=10*mm, barWidth=0.8*mm
+        )
+        barcode_draw.drawOn(pdf, x=-5*mm, y=25*mm)
+    draw_big_name_and_code(data, pdf)
+    draw_big_date_and_cell(data, pdf, date)
+    pdf.save()
