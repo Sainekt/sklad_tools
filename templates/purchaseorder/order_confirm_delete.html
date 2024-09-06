@@ -25,7 +25,7 @@
             {% csrf_token %}
             <p>Вы уверены, что хотите удалить документ приемки"{{ object.name }}"?</p>
             <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-            <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:doc_list' %}">Назад</a>
+            <a class="btn btn-success btn-sm" href="{% url 'purchaseorder:doc_list' %}">Не удалять</a>
            </form>
            
         </div>

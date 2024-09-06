@@ -109,7 +109,7 @@ def create_report(data, order):
 
     work_sheet['B3'] = (f'Сводка: Из {count_positions} позиций.')
     work_sheet['B3'].fill = GRAY_FILL
-    work_sheet['B4'] = (f'сошлось: {ok_count} позиций.')
+    work_sheet['B4'] = (f'Сошлось: {ok_count} позиций.')
     work_sheet['B5'] = (f'Больше: {more_count} позиций.')
     work_sheet['B6'] = (f'Меньше: {less_count} позиций.')
     work_sheet['B7'] = (f'Не прислали: {none_count} позиций.')
