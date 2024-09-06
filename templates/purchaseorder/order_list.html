@@ -6,31 +6,30 @@
 <div class="mb-3">
 <a class="btn btn-dark btn" href="{% url 'purchaseorder:main' %}">Список заказов поставщику "Мой Склад"</a>
 </div>
+<h5> Созданные документы</h5>
 <div class="row justify-content-center">
-  <div class="col-md-10">
-    <div class="card mb-3 card text-white bg-dark mb-3">
-      <div class="card-header text-white bg-dark mb-3 text-center">
-        Список созданных документов
-      </div>
-
+  <div class="col-md-12">
       {% if page_obj %}
-        {% for order in page_obj %}
-        <div class="card mb-3 text-white bg-dark">  <!--  Новая карточка для каждого заказа -->
-          <div class="card-header">
-            <h5 class="card-title">Заказ: {{order.name}}</h5>  <!--  Заголовок карточки -->
-          </div>
-          <div class="card-body">
-            <p class="card-text">Slug: {{order.slug}}</p>
-            <p class="card-text">Создано: {{order.created_at}}</p>
-              <div class="d-flex justify-content-between">
-              <a class="btn btn-light btn-sm" href="{% url 'purchaseorder:document' order.slug %}">Открыть документ</a>
-              <a class="btn btn-danger btn-sm" href="{% url 'purchaseorder:doc_delete' order.id %}"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
-              </svg></a>
+        <div class="row">  <!--  Добавляем row для размещения карточек в ряд -->
+          {% for order in page_obj %}
+          <div class="col-md-4 mb-3">  <!--  Добавляем col для разделения карточек -->
+            <div class="card mb-3 text-white bg-dark">  <!--  Новая карточка для каждого заказа -->
+              <div class="card-header">
+                <h5 class="card-title">Заказ: {{order.name}}</h5>  <!--  Заголовок карточки -->
+              </div>
+              <div class="card-body">
+                <p class="card-text">Slug: {{order.slug}}</p>
+                <p class="card-text">Создано: {{order.created_at}}</p>
+                  <div class="d-flex justify-content-between">
+                  <a class="btn btn-light btn-sm" href="{% url 'purchaseorder:document' order.slug %}">Открыть документ</a>
+                  <a class="btn btn-danger btn-sm" href="{% url 'purchaseorder:doc_delete' order.id %}"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                    <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                  </svg></a>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        {% endfor %}
+          {% endfor %}
       {% else %}
         <div class="card-body text-center">
           <p>Нет заказов</p>
