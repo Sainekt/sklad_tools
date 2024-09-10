@@ -10,12 +10,16 @@
     <a class="btn btn-dark btn" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформироватьфайл</a>
   </div>
 </form>
-  <h1>Документ заказа: {{order.name}} </h1>
-  <h3>Позиций в заказе: {{ len_doc }} </h3>
-  <br>
-  <a class="btn btn-primary btn" href="{% url 'purchaseorder:download_label' %}"  download>Скачать этикетку</a>
-  <br>
-
+  <div class="d-flex justify-content-between">
+    <div>
+      <h1>Документ заказа: {{order.name}} </h1>
+      <h3>Позиций в заказе: {{ len_doc }} </h3>
+    </div>
+    <div>
+      <br><br>
+    <a class="btn btn-primary btn" href="{% url 'purchaseorder:download_label' %}"  download>Скачать этикетку</a>
+    </div>
+  </div>
   <form method="post">
     {% csrf_token %}
     <table class="table table-sm table-striped">
