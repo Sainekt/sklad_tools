@@ -7,7 +7,7 @@
   <div class="d-flex justify-content-between">
     {% csrf_token %}
     <button type="submit" class="btn btn-dark btn">Обновить документ</button>
-    <a class="btn btn-dark btn" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформироватьфайл</a>
+    <a class="btn btn-dark btn" href="{% url 'purchaseorder:download_doc' order.order_id %}">Сформировать файл</a>
   </div>
 </form>
   <div class="d-flex justify-content-between">
